@@ -131,42 +131,62 @@
 .r-actions button:disabled { opacity: 0.3; cursor: default; }
 .r-actions button.on { color: #bdf5dd; border-color: rgba(120,220,180,0.6); }
 
-.r-bar { position: relative; height: 22px; background: rgba(8,14,30,0.85);
+.r-bar { position: relative; height: 26px; background: rgba(8,14,30,0.85);
   border: 1px solid rgba(90,120,190,0.22); overflow: hidden; }
 .r-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0;
   background: linear-gradient(90deg, rgba(70,170,255,0.35), rgba(70,170,255,0.08)); transition: width .4s; }
 .r-bar::after { content: ''; position: absolute; inset: 0;
   background: repeating-linear-gradient(90deg, transparent 0 39px, rgba(120,160,230,0.14) 39px 40px); }
-.r-bar span { position: absolute; left: 10px; top: 3px; font-size: 11px; color: #9fb6dd; z-index: 2; }
+.r-bar span { position: absolute; left: 10px; top: 4px; font-size: 11px; color: #cfe0ff; z-index: 2;
+  text-shadow: 0 0 8px rgba(90,150,255,0.6); }
+.r-bar span.pct { position: absolute; left: auto; right: 10px; top: 4px; font-size: 12px; font-weight: 600;
+  color: #e9f2ff; z-index: 2; }
 
-.r-cabinet { display: flex; gap: 9px; overflow-x: auto; padding: 6px 2px 12px; min-height: 240px; }
-.file-card { flex: 0 0 124px; height: 210px; cursor: pointer; position: relative; padding: 10px 9px;
-  display: flex; flex-direction: column; gap: 6px; border-radius: 2px;
+.r-cabinet { position: relative; display: flex; align-items: flex-end; gap: 8px; overflow-x: auto;
+  padding: 46px 2px 14px; min-height: 330px; }
+.fab-label { position: absolute; top: 2px; transform: translateX(-50%); text-align: center;
+  font-size: 12px; letter-spacing: 1px; color: #dce9ff; white-space: nowrap; pointer-events: none; }
+.fab-label::after { content: ''; position: absolute; left: 50%; top: 100%; width: 1px; height: 22px;
+  background: linear-gradient(180deg, rgba(150,200,255,0.75), rgba(150,200,255,0.1)); }
+.fab-label i { display: inline-block; width: 0; height: 0; border-left: 4px solid transparent;
+  border-right: 4px solid transparent; border-top: 6px solid rgba(150,200,255,0.85);
+  position: absolute; left: 50%; top: calc(100% + 22px); margin-left: -4px; }
+.fab-label em { font-style: normal; margin-left: 5px; font-size: 9px; padding: 0 4px; border-radius: 2px;
+  color: #1a1206; background: #e8b64c; vertical-align: 2px; }
+.file-card { flex: 0 0 108px; height: 262px; cursor: pointer; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; align-items: stretch; border-radius: 2px;
   border: 1px solid rgba(110,150,220,0.22);
-  background: linear-gradient(180deg, rgba(30,52,100,0.42), rgba(8,14,30,0.6));
+  background:
+    repeating-linear-gradient(90deg, rgba(120,180,255,0.05) 0 1px, transparent 1px 8px),
+    linear-gradient(180deg, rgba(28,48,94,0.5), rgba(8,14,30,0.66));
   transition: transform .2s, box-shadow .2s, border-color .2s; }
-.file-card::before { content: ''; position: absolute; left: 9px; right: 9px; top: 46px; bottom: 44px;
-  background: linear-gradient(180deg, rgba(120,180,255,0.09), rgba(120,180,255,0.02));
+.file-card::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(140,200,255,0.55), transparent); opacity: 0.45; }
+.file-card .f-icon { position: relative; width: 36px; height: 30px; margin: 34px auto 0; opacity: 0.7; }
+.file-card .f-icon::before { content: ''; position: absolute; left: 0; top: 7px; width: 36px; height: 22px;
+  border-radius: 2px; border: 1.5px solid rgba(150,200,255,0.85); }
+.file-card .f-icon::after { content: ''; position: absolute; left: 1px; top: 0; width: 15px; height: 7px;
+  border: 1.5px solid rgba(150,200,255,0.85); border-bottom: none; border-radius: 2px 2px 0 0; }
+.file-card .f-body { flex: 1; margin: 12px 8px; border-radius: 2px;
+  background: linear-gradient(180deg, rgba(120,180,255,0.1), rgba(120,180,255,0.02) 55%, rgba(120,180,255,0.07));
   border: 1px solid rgba(120,180,255,0.14); }
-.file-card .f-icon { width: 26px; height: 22px; position: relative; opacity: 0.75; }
-.file-card .f-icon::before { content: ''; position: absolute; left: 0; top: 4px; width: 26px; height: 16px;
-  border-radius: 2px; border: 1.4px solid rgba(150,200,255,0.85); }
-.file-card .f-icon::after { content: ''; position: absolute; left: 1px; top: -1px; width: 11px; height: 5px;
-  border: 1.4px solid rgba(150,200,255,0.85); border-bottom: none; border-radius: 2px 2px 0 0; }
-.file-card .f-name { font-size: 12px; color: #dbe7ff; margin-top: auto; }
-.file-card .f-meta { font-size: 10px; color: #7d8db4; }
-.file-card .f-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; padding: 1px 5px; border-radius: 2px; }
-.file-card .f-badge.global { color: #f0dfae; border: 1px solid rgba(226,200,140,0.55); }
-.file-card .f-badge.local { color: #9fd8ff; border: 1px solid rgba(120,190,255,0.4); }
-.file-card .f-new { position: absolute; left: 9px; top: 34px; font-size: 9px; padding: 0 4px; border-radius: 2px;
-  color: #1a1206; background: #e8b64c; }
+.file-card .f-name { font-size: 12px; color: #dbe7ff; padding: 0 9px 4px; }
+.file-card .f-meta { font-size: 10px; color: #7d8db4; padding: 0 9px 11px; line-height: 1.4; }
+.file-card .f-badge { position: absolute; top: 8px; right: 8px; z-index: 2; font-size: 9px; padding: 1px 5px; border-radius: 2px; }
+.file-card .f-badge.global { color: #f0dfae; border: 1px solid rgba(226,200,140,0.55); background: rgba(40,32,12,0.6); }
+.file-card .f-badge.local { color: #9fd8ff; border: 1px solid rgba(120,190,255,0.4); background: rgba(14,32,56,0.6); }
+.file-card .f-new { position: absolute; left: 8px; top: 8px; z-index: 2; font-size: 9px; padding: 0 4px;
+  border-radius: 2px; color: #1a1206; background: #e8b64c; }
 .file-card:hover { transform: translateY(-5px); border-color: rgba(140,200,255,0.5); }
-.file-card.on { transform: translateY(-8px); border-color: rgba(130,215,255,0.9);
-  background: linear-gradient(180deg, rgba(60,110,190,0.6), rgba(10,24,54,0.72));
-  box-shadow: 0 0 26px rgba(90,180,255,0.4), inset 0 0 22px rgba(90,180,255,0.14); }
-.file-card.on .f-icon { opacity: 1; }
+.file-card.on { transform: translateY(-10px); border-color: rgba(130,215,255,0.9);
+  background:
+    repeating-linear-gradient(90deg, rgba(140,200,255,0.09) 0 1px, transparent 1px 8px),
+    linear-gradient(180deg, rgba(60,110,190,0.65), rgba(10,24,54,0.76));
+  box-shadow: 0 0 28px rgba(90,180,255,0.42), inset 0 0 24px rgba(90,180,255,0.15); }
+.file-card.on .f-icon { opacity: 1; filter: drop-shadow(0 0 10px rgba(150,215,255,0.85)); }
 .file-card.empty { border-style: dashed; border-color: rgba(110,150,220,0.3); background: rgba(10,18,36,0.4); }
 .file-card.empty .f-name { color: #62719a; }
+.file-card.empty .f-icon { opacity: 0.28; }
 
 .r-main { flex: 1; display: grid; grid-template-columns: 280px 1fr; gap: 14px; min-height: 0; }
 .r-list { display: flex; flex-direction: column; min-height: 0; border: 1px solid rgba(90,120,190,0.18);
@@ -241,7 +261,7 @@
       <button id="r-close">×</button>
     </div>
   </div>
-  <div class="r-bar"><div class="r-bar-fill" id="r-bar"></div><span id="r-note"></span></div>
+  <div class="r-bar"><div class="r-bar-fill" id="r-bar"></div><span id="r-note"></span><span class="pct" id="r-pct">0%</span></div>
   <div class="r-cabinet" id="r-cabinet"></div>
   <div class="r-main">
     <aside class="r-list">
@@ -792,7 +812,10 @@
     updateCamera();
 
     // 三幕推进
-    if (stage === 'morph') {
+    if (qs.get('lock') !== null) {
+      stage = 'morph';
+      morphT = Math.max(0, Math.min(0.999, Number(qs.get('lock')) || 0));
+    } else if (stage === 'morph') {
       morphT = Math.max(0, Math.min(1, morphT + (dt / MORPH_SECONDS) * morphDir));
       focusTarget.x *= 0.88; focusTarget.y *= 0.88; focusTarget.z *= 0.88;
       if (morphT >= 1) stage = 'symbol';
@@ -824,7 +847,8 @@
         drawLabels();
       }
     }
-    if (st.inf > 0.5) drawInfinity(st.inf, t, st.infS);
+    if (qs.get('icon') === '0') { /* 调试：不画图标 */ }
+    else if (st.inf > 0.15) drawInfinity(st.inf, t, st.infS);
     requestAnimationFrame(frame);
   }
 
@@ -842,13 +866,14 @@
     if (stage === 'galaxy') return { k: 1, a: 1, inf: 0, roll: 0, infS: 1 };
     if (stage === 'morph') {
       const e = easeIO(morphT);
-      // 关键：星带先缩到几乎一个点、再淡出；图标从那个点大小（0.22 倍）长到 1 倍
+      // 缩到 0.24：实测这个比例下星带在屏幕上正好 172px，与图标同宽；
+      // 然后两者原位交叉淡入，视觉上就是「星带收成图标」
       return {
-        k: 1 - 0.945 * e,
+        k: 1 - 0.76 * e,
         roll: -Math.PI / 2 * e,
-        a: 1 - clamp01((morphT - 0.74) / 0.14),
-        inf: clamp01((morphT - 0.8) / 0.2),
-        infS: 0.22 + 0.78 * clamp01((morphT - 0.8) / 0.2),
+        a: qs.get('band') === '1' ? 1 : 1 - clamp01((morphT - 0.86) / 0.12),
+        inf: clamp01((morphT - 0.86) / 0.12),
+        infS: 1,
       };
     }
     return { k: 0, a: 0, inf: 1, roll: -Math.PI / 2, infS: 1 };
@@ -873,7 +898,7 @@
     const selNow = stage === 'selected' || stage === 'panel';
     const f = 1 + 0.03 * hover;
     const size = SYMBOL_PX * f * (infScale == null ? 1 : infScale);
-    const A = size * 0.56, B = size * 0.30;
+    const A = size * 0.5, B = size * 0.21;
     const pulse = 0.5 + 0.5 * Math.sin(t * 2.4);
 
     ctx.save();
@@ -894,57 +919,30 @@
     ctx.rotate(iconSpin);
     ctx.translate(-cx, -cy);
 
-    // 外环与刻度：光扫经过的地方依次点亮
-    const R0 = size * 0.74;
-    ctx.globalAlpha = alpha * 0.3;
-    ctx.strokeStyle = '#e8cf95';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.arc(cx, cy, R0, 0, Math.PI * 2); ctx.stroke();
+    // 外环：素材里没有刻度环，只有一圈很淡的冷光
+    const R0 = size * 0.62;
+    const halo = ctx.createRadialGradient(cx, cy, R0 * 0.55, cx, cy, R0 * 1.25);
+    halo.addColorStop(0, 'rgba(90,140,255,0)');
+    halo.addColorStop(0.55, 'rgba(110,170,255,' + (0.06 * alpha * (1 + hover)).toFixed(3) + ')');
+    halo.addColorStop(1, 'rgba(90,140,255,0)');
+    ctx.fillStyle = halo;
+    ctx.beginPath(); ctx.arc(cx, cy, R0 * 1.25, 0, Math.PI * 2); ctx.fill();
 
-    const head = sweep * Math.PI * 2 - Math.PI / 2;
-    const ticks = 48;
-    for (let i = 0; i < ticks; i++) {
-      const ang = (i / ticks) * Math.PI * 2 - Math.PI / 2;
-      let d = ang - head;
-      d = Math.abs(Math.atan2(Math.sin(d), Math.cos(d)));
-      const near = Math.exp(-(d * d) / 0.08) * hover;
-      const big = i % 6 === 0;
-      const lit = selNow ? 0.9 : (big ? 0.42 : 0.2) + 0.75 * near;
-      const len = big ? 11 : 4.5;
-      ctx.strokeStyle = 'rgba(236,212,155,' + (Math.min(1, lit) * alpha).toFixed(3) + ')';
-      ctx.lineWidth = big ? 1.6 : 1;
-      ctx.beginPath();
-      ctx.moveTo(cx + Math.cos(ang) * R0, cy + Math.sin(ang) * R0);
-      ctx.lineTo(cx + Math.cos(ang) * (R0 + len), cy + Math.sin(ang) * (R0 + len));
-      ctx.stroke();
-    }
-    // 光扫头：沿环一段 50° 的高亮弧，跟着 sweep 走
+    // 悬停时光沿轨道扫一圈（一条柔和的弧，不是刻度）
     if (hover > 0.05) {
-      const span = 0.9;
-      const g2 = ctx.createLinearGradient(
-        cx + Math.cos(head) * R0, cy + Math.sin(head) * R0,
-        cx + Math.cos(head - span) * R0, cy + Math.sin(head - span) * R0);
-      g2.addColorStop(0, 'rgba(255,240,200,' + (0.9 * hover * alpha).toFixed(3) + ')');
-      g2.addColorStop(1, 'rgba(255,220,150,0)');
-      ctx.strokeStyle = g2;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(cx, cy, R0, head - span, head);
-      ctx.stroke();
+      const head = sweep * Math.PI * 2 - Math.PI / 2;
+      const span = 1.1;
+      ctx.lineWidth = 2;
+      // 角度必须从小到大：起点大于终点时 canvas 会绕整整一圈
+      for (let i = 0; i < 18; i++) {
+        const a0 = head - span + span * (i / 18);
+        const a1 = a0 + span / 18 + 0.002;
+        ctx.strokeStyle = 'rgba(190,220,255,' + (0.5 * hover * alpha * Math.pow(i / 18, 2.2)).toFixed(3) + ')';
+        ctx.beginPath();
+        ctx.arc(cx, cy, R0, a0, a1);
+        ctx.stroke();
+      }
     }
-
-    // 8 根长刺
-    for (let i = 0; i < 8; i++) {
-      const ang = (i / 8) * Math.PI * 2 + Math.PI / 8;
-      const a0 = (selNow ? 0.55 : 0.3) * alpha;
-      ctx.strokeStyle = 'rgba(236,212,155,' + a0.toFixed(3) + ')';
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      ctx.moveTo(cx + Math.cos(ang) * R0, cy + Math.sin(ang) * R0);
-      ctx.lineTo(cx + Math.cos(ang) * (R0 + 16), cy + Math.sin(ang) * (R0 + 16));
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
 
     // 丝带：沿法线方向按宽度剖面填实，中间粗、交点细，像素材里那条拧起来的带子
     const pt = (u) => ({ x: cx + A * Math.sin(u), y: cy + B * Math.sin(u) * Math.cos(u) });
@@ -998,9 +996,9 @@
     for (let i = 0; i < 16; i++) {
       const ang = (i / 16) * Math.PI * 2 + spin * 0.15;
       const long = i % 4 === 0;
-      const base = long ? 0.42 : (i % 2 ? 0.14 : 0.24);
+      const base = long ? 0.26 : (i % 2 ? 0.1 : 0.16);
       const len = size * base * (1 + 0.35 * hover) * (0.9 + 0.2 * pulse);
-      ctx.strokeStyle = 'rgba(255,255,255,' + ((long ? 0.4 : 0.22) * alpha).toFixed(3) + ')';
+      ctx.strokeStyle = 'rgba(255,255,255,' + ((long ? 0.3 : 0.16) * alpha).toFixed(3) + ')';
       ctx.lineWidth = long ? 1.4 : 1;
       ctx.beginPath();
       ctx.moveTo(cx + Math.cos(ang) * coreR * 0.6, cy + Math.sin(ang) * coreR * 0.6);
@@ -1142,9 +1140,11 @@
     renderCabinet();
     const total = 1 + rulesData.workspaces.length;
     const have = (rulesData.main.exists ? 1 : 0) + rulesData.workspaces.filter((w) => w.exists).length;
-    R('r-bar').style.width = (have / total * 100).toFixed(1) + '%';
+    const pct = Math.round((have / total) * 100);
+    R('r-bar').style.width = pct + '%';
+    R('r-pct').textContent = pct + '%';
     R('r-note').style.color = '';
-    R('r-note').textContent = '规则文件 ' + have + ' / ' + total + ' 份已就绪';
+    R('r-note').textContent = '规则文件 ' + have + ' / ' + total;
     await pickFile(rulesIdx);
   }
 
@@ -1183,14 +1183,25 @@
         ? '<span class="f-badge global">全局</span>'
         : '<span class="f-badge local">仅本区</span>';
       const newTag = f.exists && fresh(f.mtime) ? '<span class="f-new">新</span>' : '';
-      card.innerHTML = badge + newTag + '<div class="f-icon"></div>'
+      card.innerHTML = badge + newTag + '<div class="f-icon"></div><div class="f-body"></div>'
         + '<div class="f-name">' + (f.exists ? 'AGENTS.md' : '未创建') + '</div>'
-        + '<div class="f-meta">' + fileLabel(f) + ' · '
-        + (f.exists ? Math.max(1, Math.round(f.size / 1024)) + 'KB' : '点击新建') + '</div>';
+        + '<div class="f-meta">' + (f.exists ? Math.max(1, Math.round(f.size / 1024)) + 'KB · ' : '') + fileLabel(f)
+        + (f.exists ? '' : ' · 点击新建') + '</div>';
       card.title = f.path;
       card.onclick = () => pickFile(i);
       box.appendChild(card);
     });
+    // 选中那块上方的标注 + 引线
+    const on = box.children[rulesIdx];
+    if (on) {
+      const f = all[rulesIdx];
+      const label = document.createElement('div');
+      label.className = 'fab-label';
+      label.style.left = (on.offsetLeft + on.offsetWidth / 2) + 'px';
+      label.innerHTML = (f.kind === 'global' ? '主规则' : fileLabel(f))
+        + (f.exists && fresh(f.mtime) ? '<em>新</em>' : '<i></i>');
+      box.appendChild(label);
+    }
   }
 
   async function pickFile(i) {
