@@ -94,58 +94,110 @@
 
 /* ---------- 第三幕：规则区 ---------- */
 #rules { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column;
-  background: linear-gradient(180deg, rgba(5,8,20,0.95), rgba(3,6,16,0.98));
-  backdrop-filter: blur(2px); padding: 18px 26px 22px; gap: 12px; }
+  background: radial-gradient(120% 80% at 50% 0%, #0b1430 0%, #050a18 55%, #03060f 100%);
+  padding: 16px 22px 20px; gap: 10px; }
 #rules.hidden { display: none; }
-.rules-head { display: flex; align-items: center; gap: 16px; }
-.rules-title { font-size: 13px; letter-spacing: 2px; color: #9fb2d8; white-space: nowrap; }
-.rules-tabs { display: flex; gap: 6px; overflow-x: auto; flex: 1; scrollbar-width: thin; }
-.rules-tabs::-webkit-scrollbar { height: 4px; }
-.rules-tabs::-webkit-scrollbar-thumb { background: rgba(120,150,220,0.3); border-radius: 2px; }
-.rules-tabs .tab { white-space: nowrap; font-size: 12px; padding: 5px 11px; border-radius: 4px;
-  border: 1px solid rgba(120,150,220,0.22); background: rgba(20,30,60,0.45); color: #8fa3cc; cursor: pointer; }
-.rules-tabs .tab.on { color: #eaf2ff; border-color: rgba(120,200,255,0.6); background: rgba(40,80,150,0.5); box-shadow: 0 0 12px rgba(80,160,255,0.25); }
-.rules-tabs .tab.missing { opacity: 0.55; border-style: dashed; }
-.rules-tabs .tab.pinned { position: sticky; left: 0; z-index: 2; background: rgba(14,22,44,0.96); border-color: rgba(226,200,140,0.45); color: #e8d9b0; }
-.rules-actions { display: flex; gap: 8px; }
-.rules-actions button { font-size: 12px; padding: 5px 12px; border-radius: 4px; cursor: pointer;
-  border: 1px solid rgba(120,150,220,0.3); background: rgba(18,28,52,0.6); color: #a9bde0; }
-.rules-actions button:disabled { opacity: 0.35; cursor: default; }
-.rules-actions button.on { border-color: rgba(120,220,180,0.6); color: #bdf5dd; }
-.rules-progress { height: 12px; position: relative; border-top: 1px solid rgba(90,120,190,0.18); border-bottom: 1px solid rgba(90,120,190,0.18); }
-.rules-progress span { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, rgba(90,190,255,0.28), rgba(90,190,255,0.06)); }
-.rules-progress em { position: absolute; left: 8px; top: -1px; font-size: 10px; font-style: normal; color: #cfe3ff; }
-.rules-cabinet { display: flex; gap: 10px; overflow-x: auto; padding: 8px 2px 10px; min-height: 190px; }
-.file-card { flex: 0 0 116px; height: 178px; border-radius: 3px; cursor: pointer; position: relative;
-  border: 1px solid rgba(110,150,220,0.22); background: linear-gradient(160deg, rgba(24,40,80,0.5), rgba(10,18,38,0.55));
-  padding: 12px 10px; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px;
-  transition: transform .18s, box-shadow .18s, border-color .18s, background .18s; overflow: hidden; }
-.file-card::before { content: ''; position: absolute; left: 10px; right: 10px; top: 34px; height: 1px; background: rgba(120,160,230,0.18); }
-.file-card .fname { font-size: 12px; color: #dce8ff; line-height: 1.35; word-break: break-all; }
-.file-card .fmeta { font-size: 10px; color: #7d8db4; }
-.file-card .fbadge { position: absolute; top: 8px; right: 8px; font-size: 9px; padding: 1px 5px; border-radius: 3px; }
-.file-card .fbadge.global { color: #f0dfae; border: 1px solid rgba(226,200,140,0.5); }
-.file-card .fbadge.local { color: #9fd8ff; border: 1px solid rgba(120,190,255,0.4); }
-.file-card .fdoc { position: absolute; left: 10px; top: 44px; right: 10px; bottom: 46px;
-  background: rgba(120,170,255,0.05); border: 1px solid rgba(120,170,255,0.12); border-radius: 2px; }
-.file-card:hover { transform: translateY(-4px); border-color: rgba(140,200,255,0.45); }
-.file-card.on { transform: translateY(-6px); border-color: rgba(120,210,255,0.75);
-  background: linear-gradient(160deg, rgba(40,80,150,0.6), rgba(14,26,54,0.7));
-  box-shadow: 0 0 24px rgba(80,170,255,0.35), inset 0 0 18px rgba(80,170,255,0.12); }
-.file-card.empty { border-style: dashed; border-color: rgba(120,150,220,0.3); background: rgba(12,20,40,0.35); }
-.file-card.empty .fname { color: #62719a; }
-.rules-body { flex: 1; display: grid; grid-template-columns: 300px 1fr; gap: 16px; min-height: 0; }
-.sec-list { overflow-y: auto; border-right: 1px solid rgba(90,120,190,0.16); padding-right: 10px; }
-.sec-item { padding: 7px 10px; font-size: 12px; color: #9db0d6; cursor: pointer; border-left: 2px solid transparent; display: flex; gap: 8px; }
-.sec-item:hover { background: rgba(60,100,180,0.12); }
-.sec-item.on { color: #eaf3ff; border-left-color: #6cd0ff; background: rgba(70,140,230,0.16); }
+
+.r-head { display: flex; align-items: center; gap: 18px; }
+.r-brand { display: flex; align-items: center; gap: 9px; flex: 0 0 auto; }
+.r-brand img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
+  box-shadow: 0 0 12px rgba(120,180,255,0.45); }
+.r-brand b { display: block; font-size: 13px; letter-spacing: 2px; color: #dfe9ff; }
+.r-brand span { display: block; font-size: 10px; color: #6f80a8; letter-spacing: 1px; }
+
+.r-tabs { display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1; padding-bottom: 2px; }
+.r-tabs::-webkit-scrollbar { height: 3px; }
+.r-tabs::-webkit-scrollbar-thumb { background: rgba(120,160,230,0.35); }
+.tab { position: relative; white-space: nowrap; font-size: 12px; padding: 7px 16px; cursor: pointer;
+  color: #8fa3cc; background: linear-gradient(180deg, rgba(28,42,80,0.55), rgba(12,20,42,0.5));
+  border: 1px solid rgba(110,150,220,0.2); border-radius: 2px; transform: skewX(-12deg); }
+.tab > span { display: inline-block; transform: skewX(12deg); }
+.tab:hover { color: #cfe0ff; border-color: rgba(130,190,255,0.45); }
+.tab.on { color: #eaf4ff; border-color: rgba(120,200,255,0.8);
+  background: linear-gradient(180deg, rgba(52,110,200,0.75), rgba(20,50,110,0.6));
+  box-shadow: 0 0 16px rgba(80,170,255,0.35), inset 0 0 12px rgba(120,200,255,0.18); }
+.tab.missing { opacity: 0.5; border-style: dashed; }
+.tab.pinned { position: sticky; left: 0; z-index: 3; color: #efdfae; border-color: rgba(226,200,140,0.5);
+  background: linear-gradient(180deg, rgba(70,58,28,0.7), rgba(24,20,10,0.7)); }
+.tab.pinned.on { color: #fff5d8; border-color: rgba(240,215,150,0.9);
+  box-shadow: 0 0 16px rgba(226,200,140,0.35); }
+
+.r-actions { display: flex; gap: 6px; flex: 0 0 auto; }
+.r-actions button { font-size: 12px; padding: 6px 14px; cursor: pointer; border-radius: 2px;
+  color: #a9bde0; background: rgba(18,28,52,0.7); border: 1px solid rgba(120,150,220,0.28); }
+.r-actions button:hover:not(:disabled) { color: #eaf3ff; border-color: rgba(130,200,255,0.6); }
+.r-actions button:disabled { opacity: 0.3; cursor: default; }
+.r-actions button.on { color: #bdf5dd; border-color: rgba(120,220,180,0.6); }
+
+.r-bar { position: relative; height: 22px; background: rgba(8,14,30,0.85);
+  border: 1px solid rgba(90,120,190,0.22); overflow: hidden; }
+.r-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+  background: linear-gradient(90deg, rgba(70,170,255,0.35), rgba(70,170,255,0.08)); transition: width .4s; }
+.r-bar::after { content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 39px, rgba(120,160,230,0.14) 39px 40px); }
+.r-bar span { position: absolute; left: 10px; top: 3px; font-size: 11px; color: #9fb6dd; z-index: 2; }
+
+.r-cabinet { display: flex; gap: 9px; overflow-x: auto; padding: 6px 2px 12px; min-height: 240px; }
+.file-card { flex: 0 0 124px; height: 210px; cursor: pointer; position: relative; padding: 10px 9px;
+  display: flex; flex-direction: column; gap: 6px; border-radius: 2px;
+  border: 1px solid rgba(110,150,220,0.22);
+  background: linear-gradient(180deg, rgba(30,52,100,0.42), rgba(8,14,30,0.6));
+  transition: transform .2s, box-shadow .2s, border-color .2s; }
+.file-card::before { content: ''; position: absolute; left: 9px; right: 9px; top: 46px; bottom: 44px;
+  background: linear-gradient(180deg, rgba(120,180,255,0.09), rgba(120,180,255,0.02));
+  border: 1px solid rgba(120,180,255,0.14); }
+.file-card .f-icon { width: 26px; height: 22px; position: relative; opacity: 0.75; }
+.file-card .f-icon::before { content: ''; position: absolute; left: 0; top: 4px; width: 26px; height: 16px;
+  border-radius: 2px; border: 1.4px solid rgba(150,200,255,0.85); }
+.file-card .f-icon::after { content: ''; position: absolute; left: 1px; top: -1px; width: 11px; height: 5px;
+  border: 1.4px solid rgba(150,200,255,0.85); border-bottom: none; border-radius: 2px 2px 0 0; }
+.file-card .f-name { font-size: 12px; color: #dbe7ff; margin-top: auto; }
+.file-card .f-meta { font-size: 10px; color: #7d8db4; }
+.file-card .f-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; padding: 1px 5px; border-radius: 2px; }
+.file-card .f-badge.global { color: #f0dfae; border: 1px solid rgba(226,200,140,0.55); }
+.file-card .f-badge.local { color: #9fd8ff; border: 1px solid rgba(120,190,255,0.4); }
+.file-card .f-new { position: absolute; left: 9px; top: 34px; font-size: 9px; padding: 0 4px; border-radius: 2px;
+  color: #1a1206; background: #e8b64c; }
+.file-card:hover { transform: translateY(-5px); border-color: rgba(140,200,255,0.5); }
+.file-card.on { transform: translateY(-8px); border-color: rgba(130,215,255,0.9);
+  background: linear-gradient(180deg, rgba(60,110,190,0.6), rgba(10,24,54,0.72));
+  box-shadow: 0 0 26px rgba(90,180,255,0.4), inset 0 0 22px rgba(90,180,255,0.14); }
+.file-card.on .f-icon { opacity: 1; }
+.file-card.empty { border-style: dashed; border-color: rgba(110,150,220,0.3); background: rgba(10,18,36,0.4); }
+.file-card.empty .f-name { color: #62719a; }
+
+.r-main { flex: 1; display: grid; grid-template-columns: 280px 1fr; gap: 14px; min-height: 0; }
+.r-list { display: flex; flex-direction: column; min-height: 0; border: 1px solid rgba(90,120,190,0.18);
+  background: rgba(10,18,38,0.6); }
+.r-list-head { padding: 9px 12px; font-size: 12px; color: #cfe0ff; letter-spacing: 1px;
+  border-bottom: 1px solid rgba(90,120,190,0.18); background: rgba(40,70,130,0.25); }
+.r-list-body { overflow-y: auto; flex: 1; padding: 4px 0; }
+.sec-item { padding: 8px 12px; font-size: 12px; color: #9db0d6; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; border-left: 2px solid transparent; }
 .sec-item i { font-style: normal; color: #5d6b8c; font-size: 10px; }
-.sec-content { display: flex; flex-direction: column; min-height: 0; gap: 8px; }
-.sec-meta { font-size: 11px; color: #71809f; }
-.sec-view { flex: 1; overflow: auto; margin: 0; font-size: 12.5px; line-height: 1.85; color: #cfdaf0;
+.sec-item em { font-style: normal; margin-left: auto; font-size: 9px; color: #1a1206; background: #e8b64c; padding: 0 4px; border-radius: 2px; }
+.sec-item:hover { background: rgba(60,100,180,0.14); color: #cfe0ff; }
+.sec-item.on { color: #eaf3ff; border-left-color: #6cd0ff; background: rgba(60,130,230,0.2); }
+
+.r-detail { display: flex; flex-direction: column; min-height: 0; gap: 10px;
+  border: 1px solid rgba(90,120,190,0.18); background: rgba(8,14,30,0.55); padding: 16px 20px; }
+.r-detail h3 { margin: 0; font-size: 15px; font-weight: 600; color: #eaf2ff; letter-spacing: 1px; }
+.r-meta { font-size: 11px; color: #6f80a8; word-break: break-all; }
+#r-view { flex: 1; overflow: auto; margin: 0; font-size: 13px; line-height: 1.9; color: #cfdaf0;
   white-space: pre-wrap; word-break: break-word; font-family: inherit; }
-.sec-edit { flex: 1; resize: none; background: rgba(8,14,30,0.85); color: #d7e4ff; border: 1px solid rgba(110,160,240,0.3);
-  border-radius: 4px; padding: 12px; font-family: Consolas, monospace; font-size: 12.5px; line-height: 1.7; }
+#r-edit-area { flex: 1; resize: none; background: rgba(6,12,26,0.9); color: #d7e4ff;
+  border: 1px solid rgba(110,160,240,0.35); padding: 12px; font-family: Consolas, monospace;
+  font-size: 12.5px; line-height: 1.7; }
+.r-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.r-empty svg { filter: drop-shadow(0 0 14px rgba(90,170,255,0.35)); }
+.r-empty .e-title { font-size: 20px; letter-spacing: 12px; color: #dbe8ff; text-indent: 12px; }
+.r-empty .e-note { font-size: 12px; color: #8497bd; max-width: 520px; text-align: center; line-height: 1.9; }
+.r-empty .e-actions { display: flex; gap: 10px; margin-top: 4px; }
+.r-empty button { font-size: 12px; padding: 6px 18px; cursor: pointer; border-radius: 2px;
+  color: #cfe2ff; background: rgba(30,60,120,0.5); border: 1px solid rgba(120,190,255,0.45); }
+.r-empty button:hover { color: #fff; border-color: rgba(150,220,255,0.8); box-shadow: 0 0 14px rgba(90,180,255,0.35); }
+.r-error button { margin-left: 10px; font-size: 12px; padding: 4px 12px; cursor: pointer;
+  background: rgba(80,30,40,0.6); color: #ffd7d7; border: 1px solid rgba(255,140,140,0.45); border-radius: 2px; }
 .hidden { display: none !important; }
 </style>
 </head>
@@ -173,24 +225,31 @@
 <div id="empty">还没有记忆</div>
 
 <div id="rules" class="hidden">
-  <div class="rules-head">
-    <div class="rules-title">记忆星图 · 规则</div>
-    <div class="rules-tabs" id="r-tabs"></div>
-    <div class="rules-actions">
+  <div class="r-head">
+    <div class="r-brand">
+      <img src="brand.jpg" alt="">
+      <div><b>记忆星图</b><span>规则文件</span></div>
+    </div>
+    <div class="r-tabs" id="r-tabs"></div>
+    <div class="r-actions">
       <button id="r-edit">编辑</button>
       <button id="r-save" disabled>保存</button>
       <button id="r-close">×</button>
     </div>
   </div>
-  <div class="rules-progress"><span id="r-bar" style="width:0"></span><em id="r-note"></em></div>
-  <div class="rules-cabinet" id="r-cabinet"></div>
-  <div class="rules-body">
-    <div class="sec-list" id="r-list"></div>
-    <div class="sec-content">
-      <div class="sec-meta" id="r-meta"></div>
-      <pre class="sec-view" id="r-view"></pre>
-      <textarea class="sec-edit hidden" id="r-edit-area" spellcheck="false"></textarea>
-    </div>
+  <div class="r-bar"><div class="r-bar-fill" id="r-bar"></div><span id="r-note"></span></div>
+  <div class="r-cabinet" id="r-cabinet"></div>
+  <div class="r-main">
+    <aside class="r-list">
+      <div class="r-list-head" id="r-list-head">小节</div>
+      <div class="r-list-body" id="r-list"></div>
+    </aside>
+    <section class="r-detail">
+      <h3 id="r-title">选择一份规则</h3>
+      <div class="r-meta" id="r-meta"></div>
+      <pre id="r-view"></pre>
+      <textarea id="r-edit-area" class="hidden" spellcheck="false"></textarea>
+    </section>
   </div>
 </div>
 
@@ -732,12 +791,12 @@
     if (stage === 'morph') {
       morphT = Math.max(0, Math.min(1, morphT + (dt / MORPH_SECONDS) * morphDir));
       if (morphT >= 1) stage = 'symbol';
-      else if (morphT <= 0) stage = 'galaxy';
+      else if (morphT <= 0) { stage = 'galaxy'; setChrome(true); }
     }
     spin += dt * 0.18;
-    if (stage === 'symbol' && symbolHover) sweep = Math.min(1, sweep + dt / 1.2);
-    else if (stage === 'selected' || stage === 'panel') sweep = (sweep + dt / 2.4) % 1;
-    else if (!symbolHover) sweep = Math.max(0, sweep - dt / 0.6);
+    const wantHover = (stage === 'selected' || stage === 'panel' || (stage === 'symbol' && symbolHover)) ? 1 : 0;
+    hoverAmt += (wantHover - hoverAmt) * Math.min(1, dt * 7);
+    if (wantHover) sweep = (sweep + dt / (stage === 'symbol' ? 1.2 : 2.6)) % 1;
 
     const st = stageInfo();
     drawSky(t);
@@ -745,7 +804,7 @@
       if (st.k < 0.999) {
         const cx = W / 2, cy = H / 2;
         ctx.save();
-        ctx.translate(cx, cy); ctx.scale(st.k, st.k); ctx.translate(-cx, -cy);
+        ctx.translate(cx, cy); ctx.rotate(st.roll || 0); ctx.scale(st.k, st.k); ctx.translate(-cx, -cy);
         ctx.globalAlpha = st.a;
         drawCore(t);
         if (qs.get('stars') !== '0') drawStars(t);
@@ -767,132 +826,180 @@
   const SYMBOL_PX = 172;          // = 徽标 86 × 2
   const MORPH_SECONDS = 2.0;
   let stage = 'galaxy';           // galaxy | morph | symbol | selected | panel
-  let morphT = 0, morphDir = 1, sweep = 0, spin = 0, symbolHover = false;
+  let morphT = 0, morphDir = 1, sweep = 0, spin = 0, symbolHover = false, hoverAmt = 0;
   let rulesData = null, rulesIdx = 0, rulesEditing = false, rulesSec = 0, rulesMtime = 0, rulesPath = '';
 
   const easeIO = (x) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
   const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
   function stageInfo() {
-    if (stage === 'galaxy') return { k: 1, a: 1, inf: 0 };
+    if (stage === 'galaxy') return { k: 1, a: 1, inf: 0, roll: 0 };
     if (stage === 'morph') {
-      return { k: 1 - 0.888 * easeIO(morphT), a: 1 - clamp01((morphT - 0.3) / 0.5), inf: clamp01((morphT - 0.5) / 0.5) };
+      const e = easeIO(morphT);
+      return {
+        k: 1 - 0.75 * e,                                   // 缩到 0.25，正好和 172px 的 ∞ 相当
+        roll: -Math.PI / 2 * e,                            // 顺时针转 90°：竖八字 → 横 ∞
+        a: 1 - clamp01((morphT - 0.45) / 0.45),
+        inf: clamp01((morphT - 0.55) / 0.45),
+      };
     }
-    return { k: 0, a: 0, inf: 1 };
+    return { k: 0, a: 0, inf: 1, roll: -Math.PI / 2 };
+  }
+
+  // ---- ∞ 徽标：沿曲线逐段上色，接近素材里的青→紫→黄丝带 ----
+  const hex2rgb = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  const mixHex = (a, b, t) => {
+    const p = hex2rgb(a), q = hex2rgb(b);
+    return 'rgb(' + Math.round(p[0] + (q[0] - p[0]) * t) + ',' + Math.round(p[1] + (q[1] - p[1]) * t) + ',' + Math.round(p[2] + (q[2] - p[2]) * t) + ')';
+  };
+  const RIBBON = ['#2fdcff', '#4bffd2', '#b96bff', '#ff56cc', '#ffe04d', '#a6ff5e'];
+  function ribbonColor(x01) {
+    const v = Math.max(0, Math.min(1, x01)) * (RIBBON.length - 1);
+    const i = Math.min(RIBBON.length - 2, Math.floor(v));
+    return mixHex(RIBBON[i], RIBBON[i + 1], v - i);
   }
 
   function drawInfinity(alpha, t) {
     const cx = W / 2, cy = H / 2;
-    const size = SYMBOL_PX;
-    const A = size * 0.54, B = size * 0.28;
-    const lit = stage === 'symbol' || stage === 'selected' || stage === 'panel';
-    const bands = ['#c86bff', '#5fe6ff', '#fff08a'];
+    const hover = hoverAmt;
+    const selNow = stage === 'selected' || stage === 'panel';
+    const f = 1 + 0.03 * hover;
+    const size = SYMBOL_PX * f;
+    const A = size * 0.56, B = size * 0.30;
+    const pulse = 0.5 + 0.5 * Math.sin(t * 2.4);
 
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
 
-    // 外环刻度：悬停时光扫依次点亮
-    const R = size * 0.66, ticks = 24;
-    ctx.globalAlpha = alpha * 0.22;
-    ctx.strokeStyle = '#e2c88c';
+    // 背后的紫蓝柔光
+    const bgR = size * 0.95;
+    const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, bgR);
+    bg.addColorStop(0, 'rgba(96,116,230,' + (0.22 * alpha).toFixed(3) + ')');
+    bg.addColorStop(0.55, 'rgba(74,58,190,' + (0.10 * alpha).toFixed(3) + ')');
+    bg.addColorStop(1, 'rgba(18,10,60,0)');
+    ctx.fillStyle = bg;
+    ctx.beginPath(); ctx.arc(cx, cy, bgR, 0, Math.PI * 2); ctx.fill();
+
+    // 外环与刻度：光扫经过的地方依次点亮
+    const R0 = size * 0.74;
+    ctx.globalAlpha = alpha * 0.3;
+    ctx.strokeStyle = '#e8cf95';
     ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
-    ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, R0, 0, Math.PI * 2); ctx.stroke();
+
+    const head = sweep * Math.PI * 2 - Math.PI / 2;
+    const ticks = 48;
     for (let i = 0; i < ticks; i++) {
       const ang = (i / ticks) * Math.PI * 2 - Math.PI / 2;
-      const frac = i / ticks;
-      let a = 0.18;
-      if (lit) {
-        if (stage === 'selected' || stage === 'panel') a = 0.8;
-        else if (symbolHover) a = frac <= sweep ? 0.9 : 0.22;
-        else a = sweep > 0 ? Math.max(0.22, 0.9 - sweep * 1.2) : 0.22;
-      }
-      const len = i % 6 === 0 ? 9 : 5;
-      ctx.strokeStyle = 'rgba(226,200,140,' + (a * alpha).toFixed(3) + ')';
-      ctx.lineWidth = 1.2;
+      let d = ang - head;
+      d = Math.abs(Math.atan2(Math.sin(d), Math.cos(d)));
+      const near = Math.exp(-(d * d) / 0.08) * hover;
+      const big = i % 6 === 0;
+      const lit = selNow ? 0.9 : (big ? 0.42 : 0.2) + 0.75 * near;
+      const len = big ? 11 : 4.5;
+      ctx.strokeStyle = 'rgba(236,212,155,' + (Math.min(1, lit) * alpha).toFixed(3) + ')';
+      ctx.lineWidth = big ? 1.6 : 1;
       ctx.beginPath();
-      ctx.moveTo(cx + Math.cos(ang) * R, cy + Math.sin(ang) * R);
-      ctx.lineTo(cx + Math.cos(ang) * (R + len), cy + Math.sin(ang) * (R + len));
+      ctx.moveTo(cx + Math.cos(ang) * R0, cy + Math.sin(ang) * R0);
+      ctx.lineTo(cx + Math.cos(ang) * (R0 + len), cy + Math.sin(ang) * (R0 + len));
       ctx.stroke();
     }
-
-    // 三条光带
-    for (let b = 0; b < 3; b++) {
-      ctx.strokeStyle = bands[b];
-      ctx.globalAlpha = alpha * (b === 1 ? 0.55 : 0.45);
+    // 8 根长刺
+    for (let i = 0; i < 8; i++) {
+      const ang = (i / 8) * Math.PI * 2 + Math.PI / 8;
+      const a0 = (selNow ? 0.55 : 0.3) * alpha;
+      ctx.strokeStyle = 'rgba(236,212,155,' + a0.toFixed(3) + ')';
       ctx.lineWidth = 1.4;
       ctx.beginPath();
-      for (let i = 0; i <= 160; i++) {
-        const u = (i / 160) * Math.PI * 2;
-        const off = (b - 1) * 7;
-        const x = cx + A * Math.sin(u) + off;
-        const y = cy + B * Math.sin(u) * Math.cos(u) + off * 0.6;
-        if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+      ctx.moveTo(cx + Math.cos(ang) * R0, cy + Math.sin(ang) * R0);
+      ctx.lineTo(cx + Math.cos(ang) * (R0 + 16), cy + Math.sin(ang) * (R0 + 16));
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // 丝带：一条曲线逐段变色，先宽后窄画两遍
+    const pt = (u) => ({ x: cx + A * Math.sin(u), y: cy + B * Math.sin(u) * Math.cos(u) });
+    const N = 240;
+    const passes = [[11, 0.04], [6, 0.09], [3.6, 0.8]];
+    for (const [w, al] of passes) {
+      ctx.lineWidth = w;
+      ctx.lineCap = 'round';
+      for (let i = 0; i < N; i++) {
+        const u0 = (i / N) * Math.PI * 2, u1 = ((i + 1) / N) * Math.PI * 2;
+        const p0 = pt(u0), p1 = pt(u1);
+        ctx.strokeStyle = ribbonColor((p0.x - (cx - A)) / (2 * A));
+        ctx.globalAlpha = alpha * al;
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.stroke();
       }
-      ctx.stroke();
-      // 外发光：同一路径再描一道宽的、低透明度的
-      ctx.globalAlpha = alpha * 0.1;
-      ctx.lineWidth = 6;
-      ctx.stroke();
     }
 
-    // 沿曲线的粒子
-    for (let i = 0; i < 420; i++) {
-      const u = ((i / 420) * Math.PI * 2 + spin) % (Math.PI * 2);
-      const x = cx + A * Math.sin(u);
-      const y = cy + B * Math.sin(u) * Math.cos(u);
-      ctx.fillStyle = bands[i % 3];
-      ctx.globalAlpha = alpha * (0.22 + 0.4 * Math.abs(Math.cos(u)));
-      ctx.fillRect(x, y, 1, 1);
+    // 沿曲线的星尘
+    for (let i = 0; i < 520; i++) {
+      const u = ((i / 520) * Math.PI * 2 + spin) % (Math.PI * 2);
+      const p = pt(u);
+      const off = (i % 7 - 3) * 0.9;
+      ctx.fillStyle = ribbonColor((p.x - (cx - A)) / (2 * A));
+      ctx.globalAlpha = alpha * (0.2 + 0.5 * Math.abs(Math.cos(u)));
+      ctx.fillRect(p.x + off * 0.3, p.y + off, 1.5, 1.5);
     }
 
-    // 交点白核
-    const glow = symbolHover ? 1.35 : 1;
-    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, size * 0.17 * glow);
+    // 中央白核
+    const coreR = size * (0.17 + 0.02 * hover) * (1 + 0.05 * pulse);
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR);
     g.addColorStop(0, 'rgba(255,255,255,1)');
-    g.addColorStop(0.35, 'rgba(200,220,255,0.5)');
-    g.addColorStop(1, 'rgba(120,140,255,0)');
+    g.addColorStop(0.3, 'rgba(215,230,255,0.72)');
+    g.addColorStop(0.62, 'rgba(150,170,255,0.22)');
+    g.addColorStop(1, 'rgba(90,110,255,0)');
     ctx.globalAlpha = alpha;
     ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(cx, cy, size * 0.17 * glow, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, coreR, 0, Math.PI * 2); ctx.fill();
 
-    // 放射线
-    for (let i = 0; i < 12; i++) {
-      const ang = (i / 12) * Math.PI * 2 + spin * 0.2;
-      const len = size * (i % 3 === 0 ? 0.34 : 0.2) * (symbolHover ? 1.25 : 1);
-      ctx.strokeStyle = 'rgba(255,255,255,' + ((0.2 + 0.18 * (i % 2)) * alpha).toFixed(3) + ')';
-      ctx.lineWidth = 1;
+    // 放射光芒：长短交替，悬停时伸长
+    for (let i = 0; i < 16; i++) {
+      const ang = (i / 16) * Math.PI * 2 + spin * 0.15;
+      const long = i % 4 === 0;
+      const base = long ? 0.42 : (i % 2 ? 0.14 : 0.24);
+      const len = size * base * (1 + 0.35 * hover) * (0.9 + 0.2 * pulse);
+      ctx.strokeStyle = 'rgba(255,255,255,' + ((long ? 0.4 : 0.22) * alpha).toFixed(3) + ')';
+      ctx.lineWidth = long ? 1.4 : 1;
       ctx.beginPath();
-      ctx.moveTo(cx + Math.cos(ang) * 6, cy + Math.sin(ang) * 6);
+      ctx.moveTo(cx + Math.cos(ang) * coreR * 0.6, cy + Math.sin(ang) * coreR * 0.6);
       ctx.lineTo(cx + Math.cos(ang) * len, cy + Math.sin(ang) * len);
       ctx.stroke();
     }
 
-    // 横向炫光
-    const flare = symbolHover ? 120 : 90;
-    const lg = ctx.createLinearGradient(cx - flare, cy, cx + flare, cy);
-    lg.addColorStop(0, 'rgba(160,200,255,0)');
-    lg.addColorStop(0.5, 'rgba(220,235,255,' + (0.45 * alpha).toFixed(3) + ')');
-    lg.addColorStop(1, 'rgba(160,200,255,0)');
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = lg;
-    ctx.fillRect(cx - flare, cy - 1, flare * 2, 2);
+    // 横向与纵向的光带
+    for (const [dx, dy, len, a0] of [[1, 0, size * 0.95, 0.5], [0, 1, size * 0.34, 0.22]]) {
+      const lg = ctx.createLinearGradient(cx - dx * len, cy - dy * len, cx + dx * len, cy + dy * len);
+      lg.addColorStop(0, 'rgba(170,205,255,0)');
+      lg.addColorStop(0.5, 'rgba(226,238,255,' + (a0 * (0.7 + 0.6 * hover) * alpha).toFixed(3) + ')');
+      lg.addColorStop(1, 'rgba(170,205,255,0)');
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = lg;
+      if (dx) ctx.fillRect(cx - len, cy - 1.2, len * 2, 2.4);
+      else ctx.fillRect(cx - 1.2, cy - len, 2.4, len * 2);
+    }
     ctx.restore();
 
     // 标题与上下细线
     if (alpha > 0.5) {
-      const ty = cy + size * 0.72 + 26;
+      const ty = cy + size * 0.78 + 24;
       ctx.save();
       ctx.globalAlpha = alpha;
-      ctx.fillStyle = stage === 'selected' || stage === 'panel' ? '#eaf3ff' : '#cfd9f5';
+      ctx.fillStyle = selNow ? '#eef5ff' : '#cfd9f5';
       ctx.font = '600 15px "Microsoft YaHei", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('记忆星图', cx, ty);
-      ctx.strokeStyle = 'rgba(150,180,240,0.3)';
+      const ruleW = 78;
+      ctx.strokeStyle = 'rgba(150,180,240,0.28)';
       ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(cx - 78, ty - 20); ctx.lineTo(cx + 78, ty - 20); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(cx - 78, ty + 9); ctx.lineTo(cx + 78, ty + 9); ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx - 84, ty - 5, 1.6, 0, Math.PI * 2); ctx.fillStyle = '#e2c88c'; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(cx - ruleW, ty - 20); ctx.lineTo(cx + ruleW, ty - 20); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - ruleW, ty + 9); ctx.lineTo(cx + ruleW, ty + 9); ctx.stroke();
+      ctx.fillStyle = '#e2c88c';
+      ctx.beginPath(); ctx.arc(cx - ruleW - 6, ty - 5, 1.6, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
     }
   }
@@ -922,11 +1029,13 @@
 
   // ---------- 规则区 ----------
   const R = (id) => document.getElementById(id);
+  const fresh = (ms) => Date.now() - ms < 24 * 3600 * 1000;
+  const baseName = (p) => String(p || '').split(/[\\/]/).filter(Boolean).pop() || '';
 
   async function openRules() {
     stage = 'panel';
     R('rules').classList.remove('hidden');
-    canvas.style.filter = 'blur(6px) brightness(.45)';
+    canvas.style.filter = 'blur(8px) brightness(.35)';
     await loadRules();
   }
   function closeRules() {
@@ -935,34 +1044,81 @@
     canvas.style.filter = '';
   }
 
+  const FOLDER_SVG = [
+    '<svg width="236" height="176" viewBox="0 0 236 176" fill="none">',
+    '<path d="M22 40 L22 30 Q22 24 30 24 L92 24 Q98 24 102 30 L110 40"',
+    ' stroke="rgba(130,200,255,0.55)" stroke-width="2" stroke-linejoin="round"/>',
+    '<rect x="18" y="38" width="200" height="118" rx="8"',
+    ' fill="rgba(24,48,96,0.35)" stroke="rgba(130,200,255,0.6)" stroke-width="2"/>',
+    '<rect x="40" y="52" width="156" height="82" rx="7"',
+    ' fill="rgba(10,22,48,0.5)" stroke="rgba(120,180,255,0.35)" stroke-width="1.5"/>',
+    '<path d="M64 70 L172 118 M172 70 L64 118" stroke="rgba(255,120,120,0.8)" stroke-width="2.4" stroke-linecap="round"/>',
+    '</svg>',
+  ].join('');
+
+  function showError(msg) {
+    R('r-note').textContent = '读取失败';
+    R('r-title').textContent = '';
+    R('r-cabinet').style.display = 'none';
+    const aside = document.querySelector('.r-list');
+    if (aside) aside.style.display = 'none';
+    R('r-view').style.flex = '1';
+    R('r-meta').textContent = '';
+    R('r-list').innerHTML = '';
+    R('r-list-head').textContent = '小节';
+    R('r-view').classList.remove('hidden');
+    R('r-view').innerHTML = '<div class="r-empty">' + FOLDER_SVG
+      + '<div class="e-title">读取失败</div>'
+      + '<div class="e-note">' + msg + '</div>'
+      + '<div class="e-actions"><button id="r-retry">重试</button></div></div>';
+    const b = document.getElementById('r-retry');
+    if (b) b.onclick = () => loadRules();
+  }
+
   async function loadRules() {
-    const res = await fetch('api/rules');
-    if (!res.ok) { R('r-note').textContent = '读取失败'; return; }
+    let res;
+    try {
+      res = await fetch('api/rules');
+    } catch (e) {
+      return showError('连不上接口：' + (e && e.message ? e.message : e));
+    }
+    if (!res.ok) {
+      return showError(res.status === 404
+        ? '接口没起来（HTTP 404）。规则区是宿主侧的接口，要重启一次 DSH 才会生效；页面不用重装。'
+        : '接口返回 HTTP ' + res.status);
+    }
     rulesData = await res.json();
-    renderTabs(); renderCabinet(); pickFile(0);
+    R('r-cabinet').style.display = '';
+    const aside2 = document.querySelector('.r-list');
+    if (aside2) aside2.style.display = '';
+    rulesIdx = Math.min(rulesIdx, rulesData.workspaces.length);
+    renderTabs();
+    renderCabinet();
     const total = 1 + rulesData.workspaces.length;
     const have = (rulesData.main.exists ? 1 : 0) + rulesData.workspaces.filter((w) => w.exists).length;
     R('r-bar').style.width = (have / total * 100).toFixed(1) + '%';
-    R('r-note').textContent = '已加载 ' + have + ' / ' + total + ' 份规则文件';
+    R('r-note').textContent = '规则文件 ' + have + ' / ' + total + ' 份已就绪';
+    await pickFile(rulesIdx);
   }
 
-  function fileAt(i) {
-    if (i === 0) return rulesData.main;
-    return rulesData.workspaces[i - 1];
+  function fileAt(i) { return i === 0 ? rulesData.main : rulesData.workspaces[i - 1]; }
+  function fileLabel(f) {
+    return f.kind === 'global' ? '全局' : baseName(f.cwd);
   }
 
   function renderTabs() {
     const box = R('r-tabs');
     box.innerHTML = '';
-    const main = document.createElement('button');
-    main.className = 'tab pinned' + (rulesIdx === 0 ? ' on' : '');
-    main.textContent = '主规则';
-    main.onclick = () => pickFile(0);
-    box.appendChild(main);
+    const m = document.createElement('button');
+    m.className = 'tab pinned' + (rulesIdx === 0 ? ' on' : '');
+    m.innerHTML = '<span>主规则</span>';
+    m.title = rulesData.main.path;
+    m.onclick = () => pickFile(0);
+    box.appendChild(m);
     rulesData.workspaces.forEach((w, i) => {
       const b = document.createElement('button');
       b.className = 'tab' + (rulesIdx === i + 1 ? ' on' : '') + (w.exists ? '' : ' missing');
-      b.textContent = w.cwd.split(/[\\\\/]/).filter(Boolean).pop() + (w.exists ? '' : ' · 未创建');
+      b.innerHTML = '<span>' + baseName(w.cwd) + '</span>';
       b.title = w.cwd;
       b.onclick = () => pickFile(i + 1);
       box.appendChild(b);
@@ -972,67 +1128,85 @@
   function renderCabinet() {
     const box = R('r-cabinet');
     box.innerHTML = '';
-    [rulesData.main, ...rulesData.workspaces].forEach((f, i) => {
+    const all = [rulesData.main, ...rulesData.workspaces];
+    all.forEach((f, i) => {
       const card = document.createElement('div');
       card.className = 'file-card' + (rulesIdx === i ? ' on' : '') + (f.exists ? '' : ' empty');
-      const badge = f.kind === 'global' ? '全局' : '仅本区';
-      const name = f.kind === 'global' ? 'AGENTS.md' : (f.cwd || '').split(/[\\\\/]/).filter(Boolean).pop();
-      card.innerHTML = '<span class="fbadge ' + (f.kind === 'global' ? 'global' : 'local') + '">' + badge + '</span>'
-        + '<div class="fdoc"></div>'
-        + '<div class="fname">' + (f.exists ? 'AGENTS.md' : '未创建') + '</div>'
-        + '<div class="fmeta">' + (f.exists ? (f.size + 'B · ' + new Date(f.mtime).toLocaleDateString()) : '点击新建') + '</div>';
-      card.title = f.path + (name ? '（' + name + '）' : '');
+      const badge = f.kind === 'global'
+        ? '<span class="f-badge global">全局</span>'
+        : '<span class="f-badge local">仅本区</span>';
+      const newTag = f.exists && fresh(f.mtime) ? '<span class="f-new">新</span>' : '';
+      card.innerHTML = badge + newTag + '<div class="f-icon"></div>'
+        + '<div class="f-name">' + (f.exists ? 'AGENTS.md' : '未创建') + '</div>'
+        + '<div class="f-meta">' + fileLabel(f) + ' · '
+        + (f.exists ? Math.max(1, Math.round(f.size / 1024)) + 'KB' : '点击新建') + '</div>';
+      card.title = f.path;
       card.onclick = () => pickFile(i);
       box.appendChild(card);
     });
   }
 
   async function pickFile(i) {
-    rulesIdx = i; rulesSec = 0; rulesEditing = false;
-    renderTabs(); renderCabinet();
+    rulesIdx = i;
+    rulesSec = 0;
+    rulesEditing = false;
+    renderTabs();
+    renderCabinet();
     const f = fileAt(i);
-    rulesPath = f.path; rulesMtime = f.mtime;
-    R('r-edit').classList.remove('on'); R('r-edit').textContent = '编辑';
+    rulesPath = f.path;
+    rulesMtime = f.mtime;
+    R('r-edit').classList.remove('on');
     R('r-save').disabled = true;
     R('r-edit-area').classList.add('hidden');
     R('r-view').classList.remove('hidden');
+    R('r-title').textContent = f.kind === 'global' ? '全局规则' : baseName(f.cwd) + ' · 规则';
+    R('r-list-head').textContent = '小节';
 
     if (!f.exists) {
-      R('r-meta').textContent = f.kind === 'global' ? '全局规则文件还没创建' : '这个工作区还没有 AGENTS.md';
+      R('r-meta').textContent = f.path + '（还没有这个文件）';
       R('r-list').innerHTML = '';
-      R('r-view').textContent = '点「编辑」可以新建一份，内容只有一行标题：\\n# ' + ((f.cwd || '').split(/[\\\\/]/).filter(Boolean).pop() || '工作区') + ' · 规则';
+      R('r-view').innerHTML = '<div class="r-empty">' + FOLDER_SVG
+        + '<div class="e-title">还没有规则</div>'
+        + '<div class="e-note">' + fileLabel(f) + ' 还没有 AGENTS.md。点「编辑」新建，内容只有一行标题：# ' + fileLabel(f) + ' · 规则</div></div>';
       R('r-edit').dataset.create = '1';
       return;
     }
     R('r-edit').dataset.create = '';
-    const res = await fetch('api/rules/file?path=' + encodeURIComponent(f.path));
-    if (!res.ok) { R('r-view').textContent = '读取失败：' + res.status; return; }
-    const d = await res.json();
-    rulesMtime = d.mtime;
-    renderSections(f);
     R('r-meta').textContent = f.path + ' · ' + f.size + 'B · ' + new Date(f.mtime).toLocaleString();
-    rulesEditing = false;
-    R('r-view').textContent = f.sections[rulesSec]?.text || d.content;
+    renderSections(f);
+    R('r-view').textContent = f.sections[0] ? f.sections[0].text : '';
   }
 
   function renderSections(f) {
     const box = R('r-list');
     box.innerHTML = '';
+    R('r-list-head').textContent = (f.kind === 'global' ? '全局规则' : baseName(f.cwd)) + ' · ' + f.sections.length + ' 节';
     f.sections.forEach((sec, i) => {
       const el = document.createElement('div');
       el.className = 'sec-item' + (i === 0 ? ' on' : '');
-      el.innerHTML = '<i>' + String(i + 1).padStart(2, '0') + '</i><span>' + sec.title + '</span>';
+      el.innerHTML = '<i>' + String(i + 1).padStart(2, '0') + '</i><span>' + sec.title + '</span>'
+        + (fresh(f.mtime) ? '<em>新</em>' : '');
       el.onclick = () => {
         rulesSec = i;
         [...box.children].forEach((c, k) => c.classList.toggle('on', k === i));
         R('r-view').textContent = sec.text;
+        R('r-title').textContent = sec.title;
       };
       box.appendChild(el);
     });
   }
 
-  R('r-close').onclick = () => closeRules();
-  R('rules').addEventListener('click', (e) => { if (e.target.id === 'rules') closeRules(); });
+  const maybeClose = () => {
+    if (rulesEditing && !confirm('还有没保存的改动，确定关掉？')) return;
+    rulesEditing = false;
+    R('r-save').disabled = true;
+    R('r-edit').classList.remove('on');
+    R('r-edit-area').classList.add('hidden');
+    R('r-view').classList.remove('hidden');
+    closeRules();
+  };
+  R('r-close').onclick = () => maybeClose();
+  R('rules').addEventListener('click', (e) => { if (e.target.id === 'rules') maybeClose(); });
 
   R('r-edit').onclick = async () => {
     if (rulesEditing) return;
@@ -1085,7 +1259,7 @@
 
   window.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if (stage === 'panel') { closeRules(); e.preventDefault(); return; }
+    if (stage === 'panel') { maybeClose(); e.preventDefault(); return; }
     if (stage === 'selected') { stage = 'symbol'; e.preventDefault(); return; }
     if (stage === 'symbol') { backToGalaxy(); e.preventDefault(); }
   });
@@ -1122,7 +1296,7 @@
     target.pitch += vPitch;
     if (moved > 6) autoSpin = false;
   });
-  canvas.addEventListener('pointerleave', () => { hovered = null; });
+  canvas.addEventListener('pointerleave', () => { hovered = null; symbolHover = false; });
   window.addEventListener('pointerup', (e) => {
     if (stage === 'symbol' || stage === 'selected') {
       if (nearSymbol(e.clientX, e.clientY)) {
