@@ -1,0 +1,6 @@
+# Bundle patch for dsh-memory-starmap.
+#
+# 把插件挂进 profile 的层栈；浏览器半边由 package.json 的 dsh.client 决定。
+- insert:
+    - id: memory-starmap
+      name: 'dsh-memory-starmap'

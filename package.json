@@ -1,0 +1,53 @@
+{
+  "name": "dsh-memory-starmap",
+  "version": "0.1.0",
+  "description": "记忆星图：把 DSH 的对话历史画成一条八字形星带，星点就是记忆，侧栏一点就能进；同一份索引还能按预算喂给模型。",
+  "icon": "public/brand.jpg",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./store": "./lib/store.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "lib/store.js",
+    "public/index.html",
+    "public/brand.jpg",
+    "bin/serve.js",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "memory",
+    "记忆星图",
+    "starmap",
+    "canvas"
+  ],
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dsh": {
+    "engines": {
+      "dsh": ">=0.2.0-rc.1"
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    }
+  },
+  "scripts": {
+    "check": "node --check lib/index.js && node --check lib/client.js && node --check lib/store.js",
+    "dev": "node bin/serve.js"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,15 @@
+# 运行时缓存（会话解析 + 索引快照），删了会自动重建
+.mobius/
+
+# 打包产物
+*.tgz
+
+# 依赖
+node_modules/
+
+# 浏览器调试用的临时 profile
+.chrome-*/
+
+# 系统垃圾
+.DS_Store
+Thumbs.db
