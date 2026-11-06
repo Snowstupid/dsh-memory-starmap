@@ -116,8 +116,8 @@
 .r-tabs::-webkit-scrollbar-thumb { background: rgba(120,160,230,0.35); }
 .tab { position: relative; white-space: nowrap; font-size: 12px; padding: 7px 16px; cursor: pointer;
   color: #8fa3cc; background: linear-gradient(180deg, rgba(28,42,80,0.55), rgba(12,20,42,0.5));
-  border: 1px solid rgba(110,150,220,0.2); border-radius: 2px; transform: skewX(-12deg); }
-.tab > span { display: inline-block; transform: skewX(12deg); }
+  border: 1px solid rgba(110,150,220,0.2); border-radius: 2px; }
+.tab > span { display: inline-block; }
 .tab:hover { color: #cfe0ff; border-color: rgba(130,190,255,0.45); }
 .tab.on { color: #eaf4ff; border-color: rgba(120,200,255,0.8);
   background: linear-gradient(180deg, rgba(52,110,200,0.75), rgba(20,50,110,0.6));
@@ -823,7 +823,7 @@
       morphT = Math.max(0, Math.min(0.999, Number(qs.get('lock')) || 0));
     } else if (stage === 'morph') {
       morphT = Math.max(0, Math.min(1, morphT + (dt / MORPH_SECONDS) * morphDir));
-      focusTarget.x *= 0.88; focusTarget.y *= 0.88; focusTarget.z *= 0.88;
+      focusTarget.x *= 0.8; focusTarget.y *= 0.8; focusTarget.z *= 0.8;
       // 凝缩时把 yaw 压回 0，保证每一轮的收束角度完全一样
       target.yaw += (0 - target.yaw) * 0.16;
       if (morphT >= 1) stage = 'symbol';
@@ -855,8 +855,24 @@
         drawLabels();
       }
     }
-    if (qs.get('icon') === '0') { /* 调试：不画图标 */ }
-    else if (st.inf > 0.15) drawInfinity(st.inf, t, st.infS);
+
+    // 图标：凝缩时贴住星带的实测包围盒，稳定后归位到屏幕正中
+    if (qs.get('icon') !== '0' && st.inf > 0.02) {
+      let view = null;
+      if (stage === 'morph') {
+        const b = bandBounds();
+        if (b) {
+          const settle = clamp01((morphT - 0.86) / 0.14);
+          view = {
+            cx: W / 2,
+            cy: H / 2,
+            size: Math.max(24, b.w) * (1 - settle) + SYMBOL_PX * settle,
+          };
+        }
+      }
+      drawInfinity(st.inf, t, view);
+    }
+
     requestAnimationFrame(frame);
   }
 
@@ -869,6 +885,19 @@
 
   const easeIO = (x) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
   const clamp01 = (x) => Math.max(0, Math.min(1, x));
+
+  // 星带当前在屏幕上的包围盒（只在凝缩时用，1100 个点够快）
+  function bandBounds() {
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    for (const n of NODES) {
+      if (!visible(n)) continue;
+      const p = project(nodePos(n));
+      if (p.x < x0) x0 = p.x; if (p.x > x1) x1 = p.x;
+      if (p.y < y0) y0 = p.y; if (p.y > y1) y1 = p.y;
+    }
+    if (x0 > x1) return null;
+    return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w: x1 - x0, h: y1 - y0 };
+  }
 
   function stageInfo() {
     if (stage === 'galaxy') return { k: 1, a: 1, inf: 0, roll: 0, infS: 1 };
@@ -900,11 +929,12 @@
     return mixHex(RIBBON[i], RIBBON[i + 1], v - i);
   }
 
-  function drawInfinity(alpha, t, infScale) {
-    const cx = W / 2, cy = H / 2;
+  function drawInfinity(alpha, t, view) {
+    const cx = view && view.cx != null ? view.cx : W / 2;
+    const cy = view && view.cy != null ? view.cy : H / 2;
     const hover = hoverAmt;
     const selNow = stage === 'selected' || stage === 'panel';
-    const size = SYMBOL_PX * (1 + 0.03 * hover) * (infScale == null ? 1 : infScale);
+    const size = (view && view.size ? view.size : SYMBOL_PX) * (1 + 0.03 * hover);
     const A = size * 0.5, B = size * 0.22;
     const pulse = 0.5 + 0.5 * Math.sin(t * 2.2);
     const k = 1 + 0.25 * hover;
@@ -938,9 +968,9 @@
       ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * len, Math.sin(a) * len); ctx.stroke();
     }
 
-    // 金色粗环 + 四角（素材里选中时最明显的那圈）
+    // 金色粗环 + 四角：视频里悬停/选中时才浮现的这一圈
     const R = size * 0.62;
-    const ringA = (0.42 + 0.48 * hover) * alpha;
+    const ringA = (0.06 + 0.92 * hover) * alpha;   // 静止时几乎不可见，悬停/选中才亮起来
     const gold = ctx.createLinearGradient(-R, -R, R, R);
     gold.addColorStop(0, '#f6e6b8');
     gold.addColorStop(0.35, '#d8b367');
@@ -1043,9 +1073,9 @@
     };
 
     // 外晕 → 中层 → 亮芯，三层叠出笔触
-    const BW = size * 0.058;   // 丝带半宽（别用 W，那是画布宽度）
-    ctx.globalAlpha = alpha * 0.18; ctx.fillStyle = grad; bandPath(BW * 2.2, 0); ctx.fill();
-    ctx.globalAlpha = alpha * 0.3; bandPath(BW * 1.15, 1.7); ctx.fill();
+    const BW = size * 0.042;   // 丝带半宽（别用 W，那是画布宽度）
+    ctx.globalAlpha = alpha * 0.18; ctx.fillStyle = grad; bandPath(BW * 1.7, 0); ctx.fill();
+    ctx.globalAlpha = alpha * 0.3; bandPath(BW * 1.05, 1.7); ctx.fill();
     // 实心层用正常叠色，避免三层加法叠成白色
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = alpha * 0.95; bandPath(BW * 0.5, 3.1); ctx.fill();
