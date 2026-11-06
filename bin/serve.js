@@ -8,6 +8,7 @@ import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getIndex, graphPayload, nodeDetail, patchOverrides, readOverrides, recall, search } from '../lib/store.js';
+import { listRules, readRule, writeRule } from '../lib/rules.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(HERE, '..', 'public');
@@ -49,6 +50,22 @@ const server = http.createServer((req, res) => {
   if (p === '/api/meta') return json(res, 200, getIndex().meta);
   if (p === '/api/search') {
     return json(res, 200, { q: q.get('q') || '', hits: search(getIndex(), q.get('q') || '', 12, readOverrides()) });
+  }
+  if (p === '/api/rules') {
+    return json(res, 200, listRules());
+  }
+  if (p === '/api/rules/file') {
+    if (req.method === 'GET') {
+      const out = readRule(q.get('path') || '');
+      return out.status === 200 ? json(res, 200, out.body) : json(res, out.status, { ok: false, error: out.error });
+    }
+    return readBody(req, 1024 * 1024, (err, text) => {
+      if (err) return json(res, 400, { ok: false, error: err });
+      let body;
+      try { body = JSON.parse(text); } catch { return json(res, 400, { ok: false, error: 'bad-json' }); }
+      const out = writeRule(body);
+      return out.status === 200 ? json(res, 200, out.body) : json(res, out.status, { ok: false, ...out });
+    });
   }
   if (p === '/api/overrides') {
     const ov = readOverrides();

@@ -17,6 +17,7 @@
     "lib/client.js",
     "lib/store.js",
     "lib/model.js",
+    "lib/rules.js",
     "public/index.html",
     "public/brand.jpg",
     "bin/serve.js",

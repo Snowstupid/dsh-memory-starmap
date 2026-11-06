@@ -77,6 +77,61 @@ const hit = await recallTool.execute({ query: '莫比乌斯 八字', budget: 400
 ok(hit.found === true && hit.used <= 400, '工具能命中且预算生效', `used=${hit.used}`);
 ok(sections.some((x) => x.name === 'mobius:index'), '注入了 mobius:index 提示词段');
 
+// ---------- 规则文件接口 ----------
+{
+  // 造一个假工作区：会话记录里的 cwd 指向它，规则文件由接口来新建
+  const zlib = await import('node:zlib');
+  const wsDir = path.join(tmpHome, 'ws-demo');
+  fs.mkdirSync(wsDir, { recursive: true });
+  const sessDir = path.join(tmpHome, 'sessions', 'w-1', 's-1');
+  fs.mkdirSync(sessDir, { recursive: true });
+  const rec = Buffer.from(JSON.stringify({ type: 'session', cwd: wsDir }) + '\n');
+  fs.writeFileSync(path.join(sessDir, 'session.v4.jsonl.zstd'), zlib.zstdCompressSync(rec));
+
+  // 全局规则文件
+  fs.mkdirSync(tmpHome, { recursive: true });
+  fs.writeFileSync(path.join(tmpHome, 'AGENTS.md'), '# 全局\n总则一段。\n\n## 第一节\n内容一\n\n## 第二节\n内容二\n');
+
+  const call = async (u, opt) => (await fetch(base + u, opt)).json();
+  const rules = await call('/mobius/api/rules');
+  ok(rules.main.exists === true, '主规则文件存在');
+  ok(Array.isArray(rules.workspaces) && rules.workspaces.some((w) => w.cwd === wsDir), '规则接口列出了工作区', `${rules.workspaces.length} 个`);
+  ok(rules.main.sections.length >= 3, '主规则按标题切出了小节', rules.main.sections.map((x) => x.title).join('/'));
+
+  const f = await call('/mobius/api/rules/file?path=' + encodeURIComponent(rules.main.path));
+  ok(typeof f.content === 'string' && f.mtime > 0, '能读到规则文件正文');
+
+  const bad = await fetch(base + '/mobius/api/rules/file?path=' + encodeURIComponent('C:/Windows/win.ini'));
+  ok(bad.status === 403, '白名单拒绝任意路径读取', String(bad.status));
+
+  const target = path.join(wsDir, 'AGENTS.md');
+  const created = await fetch(base + '/mobius/api/rules/file', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ path: target, mtime: 0, content: '# 工作区 · 规则\n\n## 甲\n内容\n', create: true }),
+  });
+  ok(created.status === 200, '能新建缺失的规则文件', String(created.status));
+  const after = await created.json();
+  ok(fs.existsSync(target), '新建的文件真的落盘了');
+
+  const stale = await fetch(base + '/mobius/api/rules/file', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ path: target, mtime: after.mtime - 1, content: 'x' }),
+  });
+  ok(stale.status === 409, 'mtime 不一致 → 409', String(stale.status));
+
+  const again = await call('/mobius/api/rules/file?path=' + encodeURIComponent(target));
+  ok(again.content.includes('工作区'), '落盘内容正确');
+  const baks = fs.readdirSync(wsDir).filter((x) => x.includes('.bak-'));
+  ok(baks.length === 0, '新建文件不该有备份（只有覆盖才备份）');
+
+  const second = await fetch(base + '/mobius/api/rules/file', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ path: target, mtime: again.mtime, content: '# 改过\n' }),
+  });
+  ok(second.status === 200, 'mtime 一致时可以覆盖');
+  ok(fs.readdirSync(wsDir).some((x) => x.includes('.bak-')), '覆盖前留了备份');
+}
+
 await check('/mobius/app');
 const g = await check('/mobius/api/graph');
 const graph = JSON.parse(g.text);

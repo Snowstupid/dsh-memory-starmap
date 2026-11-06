@@ -91,6 +91,62 @@
   }
   #stats { right: 24px; bottom: 22px; color: #5d6884; font-size: 11px; text-align: right; letter-spacing: 1px; }
   #empty { position: fixed; inset: 0; display: none; place-items: center; color: var(--dim); font-size: 14px; }
+
+/* ---------- 第三幕：规则区 ---------- */
+#rules { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column;
+  background: linear-gradient(180deg, rgba(5,8,20,0.95), rgba(3,6,16,0.98));
+  backdrop-filter: blur(2px); padding: 18px 26px 22px; gap: 12px; }
+#rules.hidden { display: none; }
+.rules-head { display: flex; align-items: center; gap: 16px; }
+.rules-title { font-size: 13px; letter-spacing: 2px; color: #9fb2d8; white-space: nowrap; }
+.rules-tabs { display: flex; gap: 6px; overflow-x: auto; flex: 1; scrollbar-width: thin; }
+.rules-tabs::-webkit-scrollbar { height: 4px; }
+.rules-tabs::-webkit-scrollbar-thumb { background: rgba(120,150,220,0.3); border-radius: 2px; }
+.rules-tabs .tab { white-space: nowrap; font-size: 12px; padding: 5px 11px; border-radius: 4px;
+  border: 1px solid rgba(120,150,220,0.22); background: rgba(20,30,60,0.45); color: #8fa3cc; cursor: pointer; }
+.rules-tabs .tab.on { color: #eaf2ff; border-color: rgba(120,200,255,0.6); background: rgba(40,80,150,0.5); box-shadow: 0 0 12px rgba(80,160,255,0.25); }
+.rules-tabs .tab.missing { opacity: 0.55; border-style: dashed; }
+.rules-tabs .tab.pinned { position: sticky; left: 0; z-index: 2; background: rgba(14,22,44,0.96); border-color: rgba(226,200,140,0.45); color: #e8d9b0; }
+.rules-actions { display: flex; gap: 8px; }
+.rules-actions button { font-size: 12px; padding: 5px 12px; border-radius: 4px; cursor: pointer;
+  border: 1px solid rgba(120,150,220,0.3); background: rgba(18,28,52,0.6); color: #a9bde0; }
+.rules-actions button:disabled { opacity: 0.35; cursor: default; }
+.rules-actions button.on { border-color: rgba(120,220,180,0.6); color: #bdf5dd; }
+.rules-progress { height: 12px; position: relative; border-top: 1px solid rgba(90,120,190,0.18); border-bottom: 1px solid rgba(90,120,190,0.18); }
+.rules-progress span { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, rgba(90,190,255,0.28), rgba(90,190,255,0.06)); }
+.rules-progress em { position: absolute; left: 8px; top: -1px; font-size: 10px; font-style: normal; color: #cfe3ff; }
+.rules-cabinet { display: flex; gap: 10px; overflow-x: auto; padding: 8px 2px 10px; min-height: 190px; }
+.file-card { flex: 0 0 116px; height: 178px; border-radius: 3px; cursor: pointer; position: relative;
+  border: 1px solid rgba(110,150,220,0.22); background: linear-gradient(160deg, rgba(24,40,80,0.5), rgba(10,18,38,0.55));
+  padding: 12px 10px; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px;
+  transition: transform .18s, box-shadow .18s, border-color .18s, background .18s; overflow: hidden; }
+.file-card::before { content: ''; position: absolute; left: 10px; right: 10px; top: 34px; height: 1px; background: rgba(120,160,230,0.18); }
+.file-card .fname { font-size: 12px; color: #dce8ff; line-height: 1.35; word-break: break-all; }
+.file-card .fmeta { font-size: 10px; color: #7d8db4; }
+.file-card .fbadge { position: absolute; top: 8px; right: 8px; font-size: 9px; padding: 1px 5px; border-radius: 3px; }
+.file-card .fbadge.global { color: #f0dfae; border: 1px solid rgba(226,200,140,0.5); }
+.file-card .fbadge.local { color: #9fd8ff; border: 1px solid rgba(120,190,255,0.4); }
+.file-card .fdoc { position: absolute; left: 10px; top: 44px; right: 10px; bottom: 46px;
+  background: rgba(120,170,255,0.05); border: 1px solid rgba(120,170,255,0.12); border-radius: 2px; }
+.file-card:hover { transform: translateY(-4px); border-color: rgba(140,200,255,0.45); }
+.file-card.on { transform: translateY(-6px); border-color: rgba(120,210,255,0.75);
+  background: linear-gradient(160deg, rgba(40,80,150,0.6), rgba(14,26,54,0.7));
+  box-shadow: 0 0 24px rgba(80,170,255,0.35), inset 0 0 18px rgba(80,170,255,0.12); }
+.file-card.empty { border-style: dashed; border-color: rgba(120,150,220,0.3); background: rgba(12,20,40,0.35); }
+.file-card.empty .fname { color: #62719a; }
+.rules-body { flex: 1; display: grid; grid-template-columns: 300px 1fr; gap: 16px; min-height: 0; }
+.sec-list { overflow-y: auto; border-right: 1px solid rgba(90,120,190,0.16); padding-right: 10px; }
+.sec-item { padding: 7px 10px; font-size: 12px; color: #9db0d6; cursor: pointer; border-left: 2px solid transparent; display: flex; gap: 8px; }
+.sec-item:hover { background: rgba(60,100,180,0.12); }
+.sec-item.on { color: #eaf3ff; border-left-color: #6cd0ff; background: rgba(70,140,230,0.16); }
+.sec-item i { font-style: normal; color: #5d6b8c; font-size: 10px; }
+.sec-content { display: flex; flex-direction: column; min-height: 0; gap: 8px; }
+.sec-meta { font-size: 11px; color: #71809f; }
+.sec-view { flex: 1; overflow: auto; margin: 0; font-size: 12.5px; line-height: 1.85; color: #cfdaf0;
+  white-space: pre-wrap; word-break: break-word; font-family: inherit; }
+.sec-edit { flex: 1; resize: none; background: rgba(8,14,30,0.85); color: #d7e4ff; border: 1px solid rgba(110,160,240,0.3);
+  border-radius: 4px; padding: 12px; font-family: Consolas, monospace; font-size: 12.5px; line-height: 1.7; }
+.hidden { display: none !important; }
 </style>
 </head>
 <body>
@@ -115,6 +171,28 @@
 </aside>
 
 <div id="empty">还没有记忆</div>
+
+<div id="rules" class="hidden">
+  <div class="rules-head">
+    <div class="rules-title">记忆星图 · 规则</div>
+    <div class="rules-tabs" id="r-tabs"></div>
+    <div class="rules-actions">
+      <button id="r-edit">编辑</button>
+      <button id="r-save" disabled>保存</button>
+      <button id="r-close">×</button>
+    </div>
+  </div>
+  <div class="rules-progress"><span id="r-bar" style="width:0"></span><em id="r-note"></em></div>
+  <div class="rules-cabinet" id="r-cabinet"></div>
+  <div class="rules-body">
+    <div class="sec-list" id="r-list"></div>
+    <div class="sec-content">
+      <div class="sec-meta" id="r-meta"></div>
+      <pre class="sec-view" id="r-view"></pre>
+      <textarea class="sec-edit hidden" id="r-edit-area" spellcheck="false"></textarea>
+    </div>
+  </div>
+</div>
 
 <script>
 (() => {
@@ -650,13 +728,367 @@
     focus.z += (focusTarget.z - focus.z) * fk;
     updateCamera();
 
+    // 三幕推进
+    if (stage === 'morph') {
+      morphT = Math.max(0, Math.min(1, morphT + (dt / MORPH_SECONDS) * morphDir));
+      if (morphT >= 1) stage = 'symbol';
+      else if (morphT <= 0) stage = 'galaxy';
+    }
+    spin += dt * 0.18;
+    if (stage === 'symbol' && symbolHover) sweep = Math.min(1, sweep + dt / 1.2);
+    else if (stage === 'selected' || stage === 'panel') sweep = (sweep + dt / 2.4) % 1;
+    else if (!symbolHover) sweep = Math.max(0, sweep - dt / 0.6);
+
+    const st = stageInfo();
     drawSky(t);
-    drawCore(t);
-    if (qs.get('stars') !== '0') drawStars(t);   // ?stars=0 只看记忆星，调试用
-    drawNodes(t);
-    drawLabels();
+    if (st.a > 0.01) {
+      if (st.k < 0.999) {
+        const cx = W / 2, cy = H / 2;
+        ctx.save();
+        ctx.translate(cx, cy); ctx.scale(st.k, st.k); ctx.translate(-cx, -cy);
+        ctx.globalAlpha = st.a;
+        drawCore(t);
+        if (qs.get('stars') !== '0') drawStars(t);
+        drawNodes(t);
+        ctx.globalAlpha = 1;
+        ctx.restore();
+      } else {
+        drawCore(t);
+        if (qs.get('stars') !== '0') drawStars(t);
+        drawNodes(t);
+        drawLabels();
+      }
+    }
+    if (st.inf > 0.01) drawInfinity(st.inf, t);
     requestAnimationFrame(frame);
   }
+
+  // ---------- 三幕：定格凝缩 → ∞ 徽标 → 规则区 ----------
+  const SYMBOL_PX = 172;          // = 徽标 86 × 2
+  const MORPH_SECONDS = 2.0;
+  let stage = 'galaxy';           // galaxy | morph | symbol | selected | panel
+  let morphT = 0, morphDir = 1, sweep = 0, spin = 0, symbolHover = false;
+  let rulesData = null, rulesIdx = 0, rulesEditing = false, rulesSec = 0, rulesMtime = 0, rulesPath = '';
+
+  const easeIO = (x) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
+  const clamp01 = (x) => Math.max(0, Math.min(1, x));
+
+  function stageInfo() {
+    if (stage === 'galaxy') return { k: 1, a: 1, inf: 0 };
+    if (stage === 'morph') {
+      return { k: 1 - 0.888 * easeIO(morphT), a: 1 - clamp01((morphT - 0.3) / 0.5), inf: clamp01((morphT - 0.5) / 0.5) };
+    }
+    return { k: 0, a: 0, inf: 1 };
+  }
+
+  function drawInfinity(alpha, t) {
+    const cx = W / 2, cy = H / 2;
+    const size = SYMBOL_PX;
+    const A = size * 0.54, B = size * 0.28;
+    const lit = stage === 'symbol' || stage === 'selected' || stage === 'panel';
+    const bands = ['#c86bff', '#5fe6ff', '#fff08a'];
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+
+    // 外环刻度：悬停时光扫依次点亮
+    const R = size * 0.66, ticks = 24;
+    ctx.globalAlpha = alpha * 0.22;
+    ctx.strokeStyle = '#e2c88c';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = 1;
+    for (let i = 0; i < ticks; i++) {
+      const ang = (i / ticks) * Math.PI * 2 - Math.PI / 2;
+      const frac = i / ticks;
+      let a = 0.18;
+      if (lit) {
+        if (stage === 'selected' || stage === 'panel') a = 0.8;
+        else if (symbolHover) a = frac <= sweep ? 0.9 : 0.22;
+        else a = sweep > 0 ? Math.max(0.22, 0.9 - sweep * 1.2) : 0.22;
+      }
+      const len = i % 6 === 0 ? 9 : 5;
+      ctx.strokeStyle = 'rgba(226,200,140,' + (a * alpha).toFixed(3) + ')';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(ang) * R, cy + Math.sin(ang) * R);
+      ctx.lineTo(cx + Math.cos(ang) * (R + len), cy + Math.sin(ang) * (R + len));
+      ctx.stroke();
+    }
+
+    // 三条光带
+    for (let b = 0; b < 3; b++) {
+      ctx.strokeStyle = bands[b];
+      ctx.globalAlpha = alpha * (b === 1 ? 0.55 : 0.45);
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      for (let i = 0; i <= 160; i++) {
+        const u = (i / 160) * Math.PI * 2;
+        const off = (b - 1) * 7;
+        const x = cx + A * Math.sin(u) + off;
+        const y = cy + B * Math.sin(u) * Math.cos(u) + off * 0.6;
+        if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+      }
+      ctx.stroke();
+      // 外发光：同一路径再描一道宽的、低透明度的
+      ctx.globalAlpha = alpha * 0.1;
+      ctx.lineWidth = 6;
+      ctx.stroke();
+    }
+
+    // 沿曲线的粒子
+    for (let i = 0; i < 420; i++) {
+      const u = ((i / 420) * Math.PI * 2 + spin) % (Math.PI * 2);
+      const x = cx + A * Math.sin(u);
+      const y = cy + B * Math.sin(u) * Math.cos(u);
+      ctx.fillStyle = bands[i % 3];
+      ctx.globalAlpha = alpha * (0.22 + 0.4 * Math.abs(Math.cos(u)));
+      ctx.fillRect(x, y, 1, 1);
+    }
+
+    // 交点白核
+    const glow = symbolHover ? 1.35 : 1;
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, size * 0.17 * glow);
+    g.addColorStop(0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.35, 'rgba(200,220,255,0.5)');
+    g.addColorStop(1, 'rgba(120,140,255,0)');
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(cx, cy, size * 0.17 * glow, 0, Math.PI * 2); ctx.fill();
+
+    // 放射线
+    for (let i = 0; i < 12; i++) {
+      const ang = (i / 12) * Math.PI * 2 + spin * 0.2;
+      const len = size * (i % 3 === 0 ? 0.34 : 0.2) * (symbolHover ? 1.25 : 1);
+      ctx.strokeStyle = 'rgba(255,255,255,' + ((0.2 + 0.18 * (i % 2)) * alpha).toFixed(3) + ')';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(ang) * 6, cy + Math.sin(ang) * 6);
+      ctx.lineTo(cx + Math.cos(ang) * len, cy + Math.sin(ang) * len);
+      ctx.stroke();
+    }
+
+    // 横向炫光
+    const flare = symbolHover ? 120 : 90;
+    const lg = ctx.createLinearGradient(cx - flare, cy, cx + flare, cy);
+    lg.addColorStop(0, 'rgba(160,200,255,0)');
+    lg.addColorStop(0.5, 'rgba(220,235,255,' + (0.45 * alpha).toFixed(3) + ')');
+    lg.addColorStop(1, 'rgba(160,200,255,0)');
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = lg;
+    ctx.fillRect(cx - flare, cy - 1, flare * 2, 2);
+    ctx.restore();
+
+    // 标题与上下细线
+    if (alpha > 0.5) {
+      const ty = cy + size * 0.72 + 26;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = stage === 'selected' || stage === 'panel' ? '#eaf3ff' : '#cfd9f5';
+      ctx.font = '600 15px "Microsoft YaHei", system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('记忆星图', cx, ty);
+      ctx.strokeStyle = 'rgba(150,180,240,0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(cx - 78, ty - 20); ctx.lineTo(cx + 78, ty - 20); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - 78, ty + 9); ctx.lineTo(cx + 78, ty + 9); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx - 84, ty - 5, 1.6, 0, Math.PI * 2); ctx.fillStyle = '#e2c88c'; ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function setChrome(show) {
+    for (const el of [document.getElementById('legend'), document.getElementById('stats')]) {
+      if (el) el.style.opacity = show ? '' : '0';
+      if (el) el.style.transition = 'opacity .4s';
+    }
+    const search = document.getElementById('search');
+    if (search) { search.style.opacity = show ? '' : '0'; search.style.transition = 'opacity .4s'; search.style.pointerEvents = show ? '' : 'none'; }
+  }
+
+  function startMorph() {
+    if (stage !== 'galaxy') return;
+    setChrome(false);
+    document.getElementById('detail').classList.remove('on');
+    stage = 'morph'; morphT = 0; morphDir = 1; sweep = 0;
+    selected = null;
+    document.getElementById('detail').classList.remove('on');
+  }
+  function backToGalaxy() {
+    if (stage === 'galaxy') return;
+    if (stage === 'panel') closeRules();
+    stage = 'morph'; morphT = 1; morphDir = -1;
+  }
+
+  // ---------- 规则区 ----------
+  const R = (id) => document.getElementById(id);
+
+  async function openRules() {
+    stage = 'panel';
+    R('rules').classList.remove('hidden');
+    canvas.style.filter = 'blur(6px) brightness(.45)';
+    await loadRules();
+  }
+  function closeRules() {
+    stage = 'selected';
+    R('rules').classList.add('hidden');
+    canvas.style.filter = '';
+  }
+
+  async function loadRules() {
+    const res = await fetch('api/rules');
+    if (!res.ok) { R('r-note').textContent = '读取失败'; return; }
+    rulesData = await res.json();
+    renderTabs(); renderCabinet(); pickFile(0);
+    const total = 1 + rulesData.workspaces.length;
+    const have = (rulesData.main.exists ? 1 : 0) + rulesData.workspaces.filter((w) => w.exists).length;
+    R('r-bar').style.width = (have / total * 100).toFixed(1) + '%';
+    R('r-note').textContent = '已加载 ' + have + ' / ' + total + ' 份规则文件';
+  }
+
+  function fileAt(i) {
+    if (i === 0) return rulesData.main;
+    return rulesData.workspaces[i - 1];
+  }
+
+  function renderTabs() {
+    const box = R('r-tabs');
+    box.innerHTML = '';
+    const main = document.createElement('button');
+    main.className = 'tab pinned' + (rulesIdx === 0 ? ' on' : '');
+    main.textContent = '主规则';
+    main.onclick = () => pickFile(0);
+    box.appendChild(main);
+    rulesData.workspaces.forEach((w, i) => {
+      const b = document.createElement('button');
+      b.className = 'tab' + (rulesIdx === i + 1 ? ' on' : '') + (w.exists ? '' : ' missing');
+      b.textContent = w.cwd.split(/[\\\\/]/).filter(Boolean).pop() + (w.exists ? '' : ' · 未创建');
+      b.title = w.cwd;
+      b.onclick = () => pickFile(i + 1);
+      box.appendChild(b);
+    });
+  }
+
+  function renderCabinet() {
+    const box = R('r-cabinet');
+    box.innerHTML = '';
+    [rulesData.main, ...rulesData.workspaces].forEach((f, i) => {
+      const card = document.createElement('div');
+      card.className = 'file-card' + (rulesIdx === i ? ' on' : '') + (f.exists ? '' : ' empty');
+      const badge = f.kind === 'global' ? '全局' : '仅本区';
+      const name = f.kind === 'global' ? 'AGENTS.md' : (f.cwd || '').split(/[\\\\/]/).filter(Boolean).pop();
+      card.innerHTML = '<span class="fbadge ' + (f.kind === 'global' ? 'global' : 'local') + '">' + badge + '</span>'
+        + '<div class="fdoc"></div>'
+        + '<div class="fname">' + (f.exists ? 'AGENTS.md' : '未创建') + '</div>'
+        + '<div class="fmeta">' + (f.exists ? (f.size + 'B · ' + new Date(f.mtime).toLocaleDateString()) : '点击新建') + '</div>';
+      card.title = f.path + (name ? '（' + name + '）' : '');
+      card.onclick = () => pickFile(i);
+      box.appendChild(card);
+    });
+  }
+
+  async function pickFile(i) {
+    rulesIdx = i; rulesSec = 0; rulesEditing = false;
+    renderTabs(); renderCabinet();
+    const f = fileAt(i);
+    rulesPath = f.path; rulesMtime = f.mtime;
+    R('r-edit').classList.remove('on'); R('r-edit').textContent = '编辑';
+    R('r-save').disabled = true;
+    R('r-edit-area').classList.add('hidden');
+    R('r-view').classList.remove('hidden');
+
+    if (!f.exists) {
+      R('r-meta').textContent = f.kind === 'global' ? '全局规则文件还没创建' : '这个工作区还没有 AGENTS.md';
+      R('r-list').innerHTML = '';
+      R('r-view').textContent = '点「编辑」可以新建一份，内容只有一行标题：\\n# ' + ((f.cwd || '').split(/[\\\\/]/).filter(Boolean).pop() || '工作区') + ' · 规则';
+      R('r-edit').dataset.create = '1';
+      return;
+    }
+    R('r-edit').dataset.create = '';
+    const res = await fetch('api/rules/file?path=' + encodeURIComponent(f.path));
+    if (!res.ok) { R('r-view').textContent = '读取失败：' + res.status; return; }
+    const d = await res.json();
+    rulesMtime = d.mtime;
+    renderSections(f);
+    R('r-meta').textContent = f.path + ' · ' + f.size + 'B · ' + new Date(f.mtime).toLocaleString();
+    rulesEditing = false;
+    R('r-view').textContent = f.sections[rulesSec]?.text || d.content;
+  }
+
+  function renderSections(f) {
+    const box = R('r-list');
+    box.innerHTML = '';
+    f.sections.forEach((sec, i) => {
+      const el = document.createElement('div');
+      el.className = 'sec-item' + (i === 0 ? ' on' : '');
+      el.innerHTML = '<i>' + String(i + 1).padStart(2, '0') + '</i><span>' + sec.title + '</span>';
+      el.onclick = () => {
+        rulesSec = i;
+        [...box.children].forEach((c, k) => c.classList.toggle('on', k === i));
+        R('r-view').textContent = sec.text;
+      };
+      box.appendChild(el);
+    });
+  }
+
+  R('r-close').onclick = () => closeRules();
+  R('rules').addEventListener('click', (e) => { if (e.target.id === 'rules') closeRules(); });
+
+  R('r-edit').onclick = async () => {
+    if (rulesEditing) return;
+    const f = fileAt(rulesIdx);
+    const name = f.kind === 'global' ? '全局' : (f.cwd || '').split(/[\\/]/).filter(Boolean).pop();
+    let text = '';
+    if (f.exists) {
+      const res = await fetch('api/rules/file?path=' + encodeURIComponent(f.path));
+      if (!res.ok) { R('r-note').textContent = '读取失败：' + res.status; return; }
+      const d = await res.json();
+      text = d.content; rulesMtime = d.mtime;
+    } else {
+      text = '# ' + name + ' · 规则\n';
+      if (!confirm('这会新建 ' + f.path + '，确定？')) return;
+    }
+    if (!confirm('这些文件是对我的设定，改完会影响下一轮对话的行为。继续编辑？')) return;
+    R('r-edit-area').value = text;
+    R('r-edit-area').classList.remove('hidden');
+    R('r-view').classList.add('hidden');
+    R('r-save').disabled = false;
+    R('r-edit').classList.add('on');
+    rulesEditing = true;
+    R('r-edit-area').focus();
+  };
+
+  R('r-save').onclick = async () => {
+    if (!rulesEditing) return;
+    const f = fileAt(rulesIdx);
+    const body = { path: rulesPath, mtime: rulesMtime, content: R('r-edit-area').value, create: !f.exists };
+    const res = await fetch('api/rules/file', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
+    });
+    if (res.status === 409) {
+      R('r-note').textContent = '文件刚被别处改过，已重新载入，请再改一次';
+      rulesEditing = false;
+      R('r-save').disabled = true; R('r-edit').classList.remove('on');
+      R('r-edit-area').classList.add('hidden'); R('r-view').classList.remove('hidden');
+      await loadRules(); pickFile(rulesIdx);
+      return;
+    }
+    if (!res.ok) { R('r-note').textContent = '保存失败：' + res.status; return; }
+    const d = await res.json();
+    rulesMtime = d.mtime;
+    rulesEditing = false;
+    R('r-save').disabled = true; R('r-edit').classList.remove('on');
+    R('r-edit-area').classList.add('hidden'); R('r-view').classList.remove('hidden');
+    R('r-note').textContent = '已保存 · ' + d.size + 'B';
+    await loadRules(); pickFile(rulesIdx);
+  };
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (stage === 'panel') { closeRules(); e.preventDefault(); return; }
+    if (stage === 'selected') { stage = 'symbol'; e.preventDefault(); return; }
+    if (stage === 'symbol') { backToGalaxy(); e.preventDefault(); }
+  });
 
   // ---------- 交互 ----------
   let dragging = false, lastX = 0, lastY = 0, moved = 0, vYaw = 0, vPitch = 0;
@@ -665,7 +1097,15 @@
     dragging = true; moved = 0; lastX = e.clientX; lastY = e.clientY;
     canvas.setPointerCapture(e.pointerId);
   });
+  const nearSymbol = (x, y) => Math.hypot(x - W / 2, y - H / 2) < 120;
+
   canvas.addEventListener('pointermove', (e) => {
+    if (stage === 'morph' || stage === 'panel') { canvas.style.cursor = 'default'; return; }
+    if (stage === 'symbol' || stage === 'selected') {
+      symbolHover = nearSymbol(e.clientX, e.clientY);
+      canvas.style.cursor = symbolHover ? 'pointer' : 'default';
+      return;
+    }
     if (!dragging) {
       const n = pick(e.clientX, e.clientY, 18);
       hovered = n && n !== hovered ? n : hovered;
@@ -684,10 +1124,20 @@
   });
   canvas.addEventListener('pointerleave', () => { hovered = null; });
   window.addEventListener('pointerup', (e) => {
+    if (stage === 'symbol' || stage === 'selected') {
+      if (nearSymbol(e.clientX, e.clientY)) {
+        if (stage === 'symbol') stage = 'selected';
+        else openRules();
+      }
+      return;
+    }
+    if (stage !== 'galaxy') return;
     if (!dragging) return;
     dragging = false;
     if (moved < 6) {
       vYaw = 0; vPitch = 0;
+      // 中心那一点是「凝缩」的开关，优先于选星
+      if (Math.hypot(e.clientX - W / 2, e.clientY - H / 2) < 28) { startMorph(); return; }
       const n = pick(e.clientX, e.clientY, 24);
       if (n) select(n.id);
     } else {
@@ -698,11 +1148,13 @@
   });
   window.addEventListener('pointercancel', () => { dragging = false; vYaw = 0; vPitch = 0; });
   canvas.addEventListener('wheel', (e) => {
+    if (stage !== 'galaxy') return;
     e.preventDefault();
     const step = (e.ctrlKey ? 0.006 : 0.0016) * (e.deltaMode === 1 ? 16 : 1);
     target.dist = Math.max(1.2, Math.min(14, target.dist + e.deltaY * step));
   }, { passive: false });
   canvas.addEventListener('dblclick', () => {
+    if (stage !== 'galaxy') return;
     target.yaw = 0.05; target.pitch = 1.32; target.dist = 5.9;
     autoSpin = true;
   });
