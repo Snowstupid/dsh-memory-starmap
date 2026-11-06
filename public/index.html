@@ -868,7 +868,7 @@
           view = {
             cx: W / 2,
             cy: H / 2,
-            size: Math.max(24, b.w / 1.24) * (1 - settle) + SYMBOL_PX * settle,
+            size: Math.max(24, b.w / EMBLEM_RATIO) * (1 - settle) + SYMBOL_PX * settle,
           };
         }
       }
@@ -880,6 +880,10 @@
 
   // ---------- 三幕：定格凝缩 → ∞ 徽标 → 规则区 ----------
   const SYMBOL_PX = 172;          // = 徽标 86 × 2
+  const EMBLEM_IMG = new Image();
+  EMBLEM_IMG.src = 'emblem.png';
+  window.__dbgEmb = () => ({ complete: EMBLEM_IMG.complete, w: EMBLEM_IMG.naturalWidth, src: EMBLEM_IMG.src });
+  const EMBLEM_RATIO = 1.25;      // 图里 ∞ 占图宽约 80%，画图时要放大 1.25 倍才对上标称宽度
   const MORPH_SECONDS = 2.0;
   let stage = 'galaxy';           // galaxy | morph | symbol | selected | panel
   let morphT = 0, morphDir = 1, sweep = 0, spin = 0, symbolHover = false, hoverAmt = 0, iconSpin = 0;
@@ -1043,6 +1047,22 @@
     }
     ctx.globalAlpha = 1;
 
+    // 素材图直接画（抠好的透明底 PNG），没有图才回退到程序化丝带
+    if (EMBLEM_IMG.complete && EMBLEM_IMG.naturalWidth) {
+      const dw = size * EMBLEM_RATIO;
+      ctx.save();
+      ctx.rotate(iconSpin);   // 画布已经平移到中心了，这里不能再 translate
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(EMBLEM_IMG, -dw / 2, -dw / 2, dw, dw);
+      // 再叠一层加法，把亮度拉到素材那样
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = alpha * (0.28 + 0.2 * hover);
+      ctx.drawImage(EMBLEM_IMG, -dw / 2, -dw / 2, dw, dw);
+      ctx.restore();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = 1;
+    } else {
     // 笔刷丝带：沿法线做多边形填充（宽、边缘毛糙）
     const grad = ctx.createLinearGradient(-A, 0, A, 0);
     grad.addColorStop(0.00, '#57e8ff');
@@ -1105,10 +1125,12 @@
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(px, py, 1.1, 1.1);
     }
+    }
 
     // 中央四角星芒
     ctx.globalAlpha = 1;
-    const coreR = size * (0.15 + 0.02 * pulse) * k;
+    const hasImg = EMBLEM_IMG.complete && EMBLEM_IMG.naturalWidth;
+    const coreR = size * (hasImg ? 0.07 : 0.15) * (1 + 0.02 * pulse) * k;
     const cg = ctx.createRadialGradient(0, 0, 0, 0, 0, coreR * 2.2);
     cg.addColorStop(0, `rgba(255,255,255,${alpha})`);
     cg.addColorStop(0.35, `rgba(235,240,255,${0.5 * alpha})`);

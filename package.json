@@ -20,6 +20,7 @@
     "lib/rules.js",
     "public/index.html",
     "public/brand.jpg",
+    "public/emblem.png",
     "bin/serve.js",
     "bin/enable.mjs",
     "cordis.patch.yml",

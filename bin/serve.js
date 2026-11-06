@@ -15,6 +15,7 @@ const PUBLIC = path.join(HERE, '..', 'public');
 const PORT = Number(process.env.MOBIUS_PORT || 8787);
 
 const MIME = {
+  '.png': 'image/png',
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
