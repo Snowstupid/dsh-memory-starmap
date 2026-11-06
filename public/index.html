@@ -963,11 +963,15 @@
     ctx.fillStyle = neb;
     ctx.beginPath(); ctx.arc(0, 0, size * 1.15, 0, Math.PI * 2); ctx.fill();
 
+    const imgMode = EMBLEM_IMG.complete && EMBLEM_IMG.naturalWidth > 0;
+    const deco = imgMode ? Math.max(0, (hover - 0.15) / 0.6) : 1;   // 有素材图时，装饰只在悬停后浮现
+
     for (let i = 0; i < 26; i++) {
+      if (deco <= 0) break;
       const a = (i / 26) * Math.PI * 2 + spin * 0.1;
       const len = size * (0.55 + 0.5 * ((i * 37) % 100) / 100);
       const g = ctx.createLinearGradient(0, 0, Math.cos(a) * len, Math.sin(a) * len);
-      g.addColorStop(0, `rgba(200,215,255,${0.16 * alpha * k})`);
+      g.addColorStop(0, `rgba(200,215,255,${0.07 * alpha * k * deco})`);
       g.addColorStop(1, 'rgba(160,180,255,0)');
       ctx.strokeStyle = g;
       ctx.lineWidth = 1;
@@ -976,7 +980,7 @@
 
     // 金色粗环 + 四角：视频里悬停/选中时才浮现的这一圈
     const R = size * 0.62;
-    const ringA = (0.06 + 0.92 * hover) * alpha;   // 静止时几乎不可见，悬停/选中才亮起来
+    const ringA = (imgMode ? 0.44 * deco : (0.06 + 0.92 * hover)) * alpha;
     const gold = ctx.createLinearGradient(-R, -R, R, R);
     gold.addColorStop(0, '#f6e6b8');
     gold.addColorStop(0.35, '#d8b367');
@@ -990,8 +994,8 @@
     ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.stroke();
     // 环内冷光盘
     const disc = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.95);
-    disc.addColorStop(0, `rgba(70,110,220,${0.22 * alpha * (1 + hover * 0.5)})`);
-    disc.addColorStop(0.6, `rgba(40,70,160,${0.14 * alpha})`);
+    disc.addColorStop(0, `rgba(70,110,220,${(imgMode ? 0.07 * deco : 0.22) * alpha * (1 + hover * 0.5)})`);
+    disc.addColorStop(0.6, `rgba(40,70,160,${(imgMode ? 0.05 * deco : 0.14) * alpha})`);
     disc.addColorStop(1, 'rgba(20,40,110,0)');
     ctx.globalAlpha = 1;
     ctx.fillStyle = disc;
@@ -1003,6 +1007,7 @@
 
     // 环上细刻度
     for (let i = 0; i < 72; i++) {
+      if (deco <= 0) break;
       const a = (i / 72) * Math.PI * 2;
       const big = i % 6 === 0;
       ctx.globalAlpha = ringA * (big ? 0.85 : 0.35);
@@ -1016,6 +1021,7 @@
 
     // 四角：45° 方向的尖角装饰
     for (let i = 0; i < 4; i++) {
+      if (deco <= 0) break;
       const a = Math.PI / 4 + (i / 4) * Math.PI * 2;
       const tip = R * (1.26 + 0.06 * hover);
       const w = R * 0.11;
@@ -1041,7 +1047,7 @@
       ctx.lineWidth = 3.4;
       for (let i = 0; i < 16; i++) {
         const a0 = head - span + span * (i / 16);
-        ctx.strokeStyle = 'rgba(255,246,220,' + (0.55 * hover * alpha * Math.pow(i / 16, 2)).toFixed(3) + ')';
+        ctx.strokeStyle = 'rgba(255,246,220,' + (0.3 * hover * alpha * Math.pow(i / 16, 2)).toFixed(3) + ')';
         ctx.beginPath(); ctx.arc(0, 0, R, a0, a0 + span / 16 + 0.003); ctx.stroke();
       }
     }
@@ -1057,7 +1063,7 @@
       ctx.drawImage(EMBLEM_IMG, -dw / 2, -dw / 2, dw, dw);
       // 再叠一层加法，把亮度拉到素材那样
       ctx.globalCompositeOperation = 'lighter';
-      ctx.globalAlpha = alpha * (0.28 + 0.2 * hover);
+      ctx.globalAlpha = alpha * (0.09 + 0.06 * hover);   // 只补一点点，整体亮度≈素材×1.1
       ctx.drawImage(EMBLEM_IMG, -dw / 2, -dw / 2, dw, dw);
       ctx.restore();
       ctx.globalCompositeOperation = 'lighter';
@@ -1127,7 +1133,9 @@
     }
     }
 
-    // 中央四角星芒
+    // 中央四角星芒：有素材图时不画，图里自带
+    if (imgMode) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1; }
+    else {
     ctx.globalAlpha = 1;
     const hasImg = EMBLEM_IMG.complete && EMBLEM_IMG.naturalWidth;
     const coreR = size * (hasImg ? 0.07 : 0.15) * (1 + 0.02 * pulse) * k;
@@ -1158,8 +1166,10 @@
       ctx.lineWidth = 1.2;
       ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(ang) * len, Math.sin(ang) * len); ctx.stroke();
     }
+    }   // 结束 !imgMode
 
-    ctx.restore();
+    ctx.restore();   // 自转
+    ctx.restore();   // 合成模式
 
     // 标题与细线（不跟着转）
     if (alpha > 0.5) {
