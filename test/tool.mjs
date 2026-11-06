@@ -80,9 +80,11 @@ const ask = async (query, opts = {}) => tool.execute({ query, ...opts });
 }
 
 // 四、完全没聊过的话题：必须说没找到，不许编
+// 用一个每次随机生成的串——写死任何词都会被索引收录，下一跑就"命中"了
 {
-  const r = await ask('量子色动力学 渐近自由 证明');
-  ok(r.found === false, '④ 没聊过的话题返回 found=false');
+  const probe = `zq${Math.random().toString(36).slice(2, 8)}x${Math.random().toString(36).slice(2, 8)}`;
+  const r = await ask(probe);
+  ok(r.found === false, '④ 没聊过的话题返回 found=false', probe);
   ok(/没有足够相关的记录/.test(r.text), '④ 明确说没查到，而不是硬塞', r.text.slice(0, 40));
 }
 

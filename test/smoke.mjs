@@ -69,7 +69,9 @@ const check = async (p, expect = 200) => {
 // ---------- 模型侧：工具与提示词 ----------
 ok(registeredTool?.name === 'mobius_recall', '注册了工具 mobius_recall');
 const recallTool = registeredTool;
-const noHit = await recallTool.execute({ query: '完全没出现过的词组 量子 色动力学 渐近自由' });
+// 随机串：写死的词会被索引收录，下一跑就命中了
+const probe = `zq${Math.random().toString(36).slice(2, 8)}x${Math.random().toString(36).slice(2, 8)}`;
+const noHit = await recallTool.execute({ query: probe });
 ok(noHit.found === false && noHit.ok === true, '工具对没聊过的话题返回 found=false');
 const hit = await recallTool.execute({ query: '莫比乌斯 八字', budget: 400 });
 ok(hit.found === true && hit.used <= 400, '工具能命中且预算生效', `used=${hit.used}`);
