@@ -132,7 +132,15 @@ cd ~/.dsh/profiles/web
 pnpm add link:D:/DSHWORK/mobius-memory
 ```
 
-然后在**同一个** `package.json` 的 `dsh.profile.bundles` 数组末尾加一行 `"dsh-memory-starmap"`，重启 DSH。
+然后让它进 `dsh.profile.bundles`——`dsh plugin add` 只是转发给 pnpm，不会做这一步，包在 `node_modules` 里躺着但不会被加载：
+
+```bash
+node node_modules/dsh-memory-starmap/bin/enable.mjs web
+```
+
+（脚本会先备份 profile 的 `package.json`，重复跑是幂等的。）最后重启 DSH。
+
+**用 GUI 装就不用这一步。** 「设置 → 插件 → 添加」那个流程装完会自动扫描新依赖，凡是声明了 `dsh.bundle` 的包都会被写进 `bundles`——本包声明了，所以装完直接重启即可。
 
 用 `link:` 而不是 `file:`：file 是拷贝，改源码不生效；link 是指过来，改完重启就生效。
 

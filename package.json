@@ -19,6 +19,7 @@
     "public/index.html",
     "public/brand.jpg",
     "bin/serve.js",
+    "bin/enable.mjs",
     "cordis.patch.yml",
     "README.md"
   ],
@@ -47,7 +48,8 @@
   },
   "scripts": {
     "check": "node --check lib/index.js && node --check lib/client.js && node --check lib/store.js",
-    "dev": "node bin/serve.js"
+    "dev": "node bin/serve.js",
+    "enable": "node bin/enable.mjs"
   },
   "dependencies": {}
 }
