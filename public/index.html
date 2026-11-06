@@ -806,7 +806,7 @@
     } else if (autoSpin) {
       target.yaw += 0.0011;
     }
-    const k = dragging ? 0.35 : 0.12;   // 拖的时候跟手快一点
+    const k = stage === 'morph' ? 0.26 : (dragging ? 0.35 : 0.12);   // 凝缩时相机跟得更紧
     cam.yaw += (target.yaw - cam.yaw) * k;
     cam.pitch += (target.pitch - cam.pitch) * k;
     cam.dist += (target.dist - cam.dist) * 0.12;
@@ -824,8 +824,10 @@
     } else if (stage === 'morph') {
       morphT = Math.max(0, Math.min(1, morphT + (dt / MORPH_SECONDS) * morphDir));
       focusTarget.x *= 0.8; focusTarget.y *= 0.8; focusTarget.z *= 0.8;
-      // 凝缩时把 yaw 压回 0，保证每一轮的收束角度完全一样
-      target.yaw += (0 - target.yaw) * 0.16;
+      // 凝缩同时把视角复位：转到正面、拉回默认距离，之后缩小才对得上图标
+      target.yaw += (0 - target.yaw) * 0.18;
+      target.pitch += (1.32 - target.pitch) * 0.18;
+      target.dist += (5.9 - target.dist) * 0.18;
       if (morphT >= 1) stage = 'symbol';
       else if (morphT <= 0) { stage = 'galaxy'; setChrome(true); }
     }
@@ -862,11 +864,11 @@
       if (stage === 'morph') {
         const b = bandBounds();
         if (b) {
-          const settle = clamp01((morphT - 0.86) / 0.14);
+          const settle = clamp01((morphT - 0.94) / 0.06);
           view = {
             cx: W / 2,
             cy: H / 2,
-            size: Math.max(24, b.w) * (1 - settle) + SYMBOL_PX * settle,
+            size: Math.max(24, b.w / 1.24) * (1 - settle) + SYMBOL_PX * settle,
           };
         }
       }
@@ -908,8 +910,8 @@
       return {
         k: 1 - 0.76 * e,
         roll: -Math.PI / 2 * e,
-        a: qs.get('band') === '1' ? 1 : 1 - clamp01((morphT - 0.86) / 0.12),
-        inf: clamp01((morphT - 0.86) / 0.12),
+        a: qs.get('band') === '1' ? 1 : 1 - clamp01((morphT - 0.9) / 0.1),
+        inf: clamp01((morphT - 0.9) / 0.1),
         infS: 1,
       };
     }
@@ -1072,13 +1074,24 @@
       ctx.closePath();
     };
 
-    // 外晕 → 中层 → 亮芯，三层叠出笔触
-    const BW = size * 0.042;   // 丝带半宽（别用 W，那是画布宽度）
-    ctx.globalAlpha = alpha * 0.18; ctx.fillStyle = grad; bandPath(BW * 1.7, 0); ctx.fill();
-    ctx.globalAlpha = alpha * 0.3; bandPath(BW * 1.05, 1.7); ctx.fill();
-    // 实心层用正常叠色，避免三层加法叠成白色
+    // 笔刷：沿曲线一路盖章，半径随位置变化，实心不出空心
+    const BW = size * 0.03;    // 丝带半宽
+    const stamp = (radiusScale, alphaMul) => {
+      for (let i = 0; i <= 200; i++) {
+        const u = (i / 200) * Math.PI * 2;
+        const q = pt(u), n = norm(u);
+        const r = BW * radiusScale * (0.32 + 0.78 * Math.abs(Math.sin(u)));
+        const col = ribbonColor((q.x + A) / (2 * A));
+        ctx.globalAlpha = alpha * alphaMul;
+        ctx.fillStyle = col;
+        ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, Math.PI * 2); ctx.fill();
+      }
+    };
+    // 外晕（加法） → 实心（正常叠色）
+    stamp(2.6, 0.10);
+    stamp(1.7, 0.14);
     ctx.globalCompositeOperation = 'source-over';
-    ctx.globalAlpha = alpha * 0.95; bandPath(BW * 0.5, 3.1); ctx.fill();
+    stamp(1.0, 0.95);
     ctx.globalCompositeOperation = 'lighter';
 
     // 边缘的颗粒（干笔触感）
