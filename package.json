@@ -16,6 +16,7 @@
     "lib/index.js",
     "lib/client.js",
     "lib/store.js",
+    "lib/model.js",
     "public/index.html",
     "public/brand.jpg",
     "bin/serve.js",
@@ -57,7 +58,8 @@
   "scripts": {
     "check": "node --check lib/index.js && node --check lib/client.js && node --check lib/store.js",
     "dev": "node bin/serve.js",
-    "enable": "node bin/enable.mjs"
+    "enable": "node bin/enable.mjs",
+    "test": "node test/smoke.mjs && node test/tool.mjs"
   },
   "dependencies": {}
 }

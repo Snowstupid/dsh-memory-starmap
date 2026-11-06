@@ -22,8 +22,15 @@ const PAGE = fs.readFileSync(path.join(HERE, '..', 'public', 'index.html'), 'utf
 const SERVE = fs.readFileSync(path.join(HERE, '..', 'bin', 'serve.js'), 'utf8').replace(/\r\n/g, '\n');
 
 const routes = new Map();
+let registeredTool = null;
+const sections = [];
 const fakeCtx = {
-  get: (name) => (name === 'webServer' ? { register: ({ path, handler }) => routes.set(path, handler) } : undefined),
+  get: (name) => {
+    if (name === 'webServer') return { register: ({ path, handler }) => routes.set(path, handler) };
+    if (name === 'tools') return { register: (def) => { registeredTool = def; return () => { registeredTool = null; }; } };
+    if (name === 'systemPrompt') return { section: (s) => { sections.push(s); return () => {}; } };
+    return undefined;
+  },
   effect: (fn) => { const d = fn(); return d; },
   logger: { info: (m) => console.log('  [log]', m) },
 };
@@ -59,6 +66,15 @@ const check = async (p, expect = 200) => {
 };
 
 // ---------- 接口 ----------
+// ---------- 模型侧：工具与提示词 ----------
+ok(registeredTool?.name === 'mobius_recall', '注册了工具 mobius_recall');
+const recallTool = registeredTool;
+const noHit = await recallTool.execute({ query: '完全没出现过的词组 量子 色动力学 渐近自由' });
+ok(noHit.found === false && noHit.ok === true, '工具对没聊过的话题返回 found=false');
+const hit = await recallTool.execute({ query: '莫比乌斯 八字', budget: 400 });
+ok(hit.found === true && hit.used <= 400, '工具能命中且预算生效', `used=${hit.used}`);
+ok(sections.some((x) => x.name === 'mobius:index'), '注入了 mobius:index 提示词段');
+
 await check('/mobius/app');
 const g = await check('/mobius/api/graph');
 const graph = JSON.parse(g.text);
