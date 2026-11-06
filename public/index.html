@@ -99,11 +99,13 @@
 #rules.hidden { display: none; }
 
 .r-head { display: flex; align-items: center; gap: 18px; }
-.r-brand { display: flex; align-items: center; gap: 9px; flex: 0 0 auto; }
-.r-brand img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
-  box-shadow: 0 0 12px rgba(120,180,255,0.45); }
-.r-brand b { display: block; font-size: 13px; letter-spacing: 2px; color: #dfe9ff; }
-.r-brand span { display: block; font-size: 10px; color: #6f80a8; letter-spacing: 1px; }
+.r-back { flex: 0 0 auto; width: 28px; height: 28px; cursor: pointer; font-size: 18px; line-height: 1;
+  color: #9fb6dd; background: rgba(18,28,52,0.7); border: 1px solid rgba(120,150,220,0.28);
+  border-radius: 2px; padding-bottom: 2px; }
+.r-back:hover { color: #eaf4ff; border-color: rgba(130,200,255,0.6); box-shadow: 0 0 12px rgba(90,180,255,0.3); }
+.r-brand { display: flex; align-items: center; flex: 0 0 auto; }
+.r-brand b { font-size: 17px; letter-spacing: 5px; color: #e6eeff; text-indent: 5px;
+  text-shadow: 0 0 16px rgba(120,180,255,0.4); }
 
 .r-tabs { display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1; padding-bottom: 2px; }
 .r-tabs::-webkit-scrollbar { height: 3px; }
@@ -230,10 +232,8 @@
 
 <div id="rules" class="hidden">
   <div class="r-head">
-    <div class="r-brand">
-      <img src="brand.jpg" alt="">
-      <div><b>记忆星图</b><span>规则文件</span></div>
-    </div>
+    <button class="r-back" id="r-back" title="回到星图">‹</button>
+    <div class="r-brand"><b>如我所书</b></div>
     <div class="r-tabs" id="r-tabs"></div>
     <div class="r-actions">
       <button id="r-edit">编辑</button>
@@ -794,6 +794,7 @@
     // 三幕推进
     if (stage === 'morph') {
       morphT = Math.max(0, Math.min(1, morphT + (dt / MORPH_SECONDS) * morphDir));
+      focusTarget.x *= 0.88; focusTarget.y *= 0.88; focusTarget.z *= 0.88;
       if (morphT >= 1) stage = 'symbol';
       else if (morphT <= 0) { stage = 'galaxy'; setChrome(true); }
     }
@@ -801,6 +802,7 @@
     const wantHover = (stage === 'selected' || stage === 'panel' || (stage === 'symbol' && symbolHover)) ? 1 : 0;
     hoverAmt += (wantHover - hoverAmt) * Math.min(1, dt * 7);
     if (wantHover) sweep = (sweep + dt / (stage === 'symbol' ? 1.2 : 2.6)) % 1;
+    iconSpin += dt * 0.18 * hoverAmt;
 
     const st = stageInfo();
     drawSky(t);
@@ -822,7 +824,7 @@
         drawLabels();
       }
     }
-    if (st.inf > 0.01) drawInfinity(st.inf, t);
+    if (st.inf > 0.5) drawInfinity(st.inf, t, st.infS);
     requestAnimationFrame(frame);
   }
 
@@ -830,24 +832,26 @@
   const SYMBOL_PX = 172;          // = 徽标 86 × 2
   const MORPH_SECONDS = 2.0;
   let stage = 'galaxy';           // galaxy | morph | symbol | selected | panel
-  let morphT = 0, morphDir = 1, sweep = 0, spin = 0, symbolHover = false, hoverAmt = 0;
+  let morphT = 0, morphDir = 1, sweep = 0, spin = 0, symbolHover = false, hoverAmt = 0, iconSpin = 0;
   let rulesData = null, rulesIdx = 0, rulesEditing = false, rulesSec = 0, rulesMtime = 0, rulesPath = '';
 
   const easeIO = (x) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
   const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
   function stageInfo() {
-    if (stage === 'galaxy') return { k: 1, a: 1, inf: 0, roll: 0 };
+    if (stage === 'galaxy') return { k: 1, a: 1, inf: 0, roll: 0, infS: 1 };
     if (stage === 'morph') {
       const e = easeIO(morphT);
+      // 关键：星带先缩到几乎一个点、再淡出；图标从那个点大小（0.22 倍）长到 1 倍
       return {
-        k: 1 - 0.75 * e,                                   // 缩到 0.25，正好和 172px 的 ∞ 相当
-        roll: -Math.PI / 2 * e,                            // 顺时针转 90°：竖八字 → 横 ∞
-        a: 1 - clamp01((morphT - 0.45) / 0.45),
-        inf: clamp01((morphT - 0.55) / 0.45),
+        k: 1 - 0.945 * e,
+        roll: -Math.PI / 2 * e,
+        a: 1 - clamp01((morphT - 0.74) / 0.14),
+        inf: clamp01((morphT - 0.8) / 0.2),
+        infS: 0.22 + 0.78 * clamp01((morphT - 0.8) / 0.2),
       };
     }
-    return { k: 0, a: 0, inf: 1, roll: -Math.PI / 2 };
+    return { k: 0, a: 0, inf: 1, roll: -Math.PI / 2, infS: 1 };
   }
 
   // ---- ∞ 徽标：沿曲线逐段上色，接近素材里的青→紫→黄丝带 ----
@@ -863,19 +867,19 @@
     return mixHex(RIBBON[i], RIBBON[i + 1], v - i);
   }
 
-  function drawInfinity(alpha, t) {
+  function drawInfinity(alpha, t, infScale) {
     const cx = W / 2, cy = H / 2;
     const hover = hoverAmt;
     const selNow = stage === 'selected' || stage === 'panel';
     const f = 1 + 0.03 * hover;
-    const size = SYMBOL_PX * f;
+    const size = SYMBOL_PX * f * (infScale == null ? 1 : infScale);
     const A = size * 0.56, B = size * 0.30;
     const pulse = 0.5 + 0.5 * Math.sin(t * 2.4);
 
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
 
-    // 背后的紫蓝柔光
+    // 背后的紫蓝柔光（不跟着转，否则会有旋涡感）
     const bgR = size * 0.95;
     const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, bgR);
     bg.addColorStop(0, 'rgba(96,116,230,' + (0.22 * alpha).toFixed(3) + ')');
@@ -883,6 +887,12 @@
     bg.addColorStop(1, 'rgba(18,10,60,0)');
     ctx.fillStyle = bg;
     ctx.beginPath(); ctx.arc(cx, cy, bgR, 0, Math.PI * 2); ctx.fill();
+
+    // 外环、刻度、丝带、星核一起自转 —— 录屏里整个徽标是在慢慢转的
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(iconSpin);
+    ctx.translate(-cx, -cy);
 
     // 外环与刻度：光扫经过的地方依次点亮
     const R0 = size * 0.74;
@@ -908,6 +918,21 @@
       ctx.lineTo(cx + Math.cos(ang) * (R0 + len), cy + Math.sin(ang) * (R0 + len));
       ctx.stroke();
     }
+    // 光扫头：沿环一段 50° 的高亮弧，跟着 sweep 走
+    if (hover > 0.05) {
+      const span = 0.9;
+      const g2 = ctx.createLinearGradient(
+        cx + Math.cos(head) * R0, cy + Math.sin(head) * R0,
+        cx + Math.cos(head - span) * R0, cy + Math.sin(head - span) * R0);
+      g2.addColorStop(0, 'rgba(255,240,200,' + (0.9 * hover * alpha).toFixed(3) + ')');
+      g2.addColorStop(1, 'rgba(255,220,150,0)');
+      ctx.strokeStyle = g2;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R0, head - span, head);
+      ctx.stroke();
+    }
+
     // 8 根长刺
     for (let i = 0; i < 8; i++) {
       const ang = (i / 8) * Math.PI * 2 + Math.PI / 8;
@@ -921,33 +946,41 @@
     }
     ctx.globalAlpha = 1;
 
-    // 丝带：一条曲线逐段变色，先宽后窄画两遍
+    // 丝带：沿法线方向按宽度剖面填实，中间粗、交点细，像素材里那条拧起来的带子
     const pt = (u) => ({ x: cx + A * Math.sin(u), y: cy + B * Math.sin(u) * Math.cos(u) });
-    const N = 240;
-    const passes = [[11, 0.04], [6, 0.09], [3.6, 0.8]];
-    for (const [w, al] of passes) {
-      ctx.lineWidth = w;
-      ctx.lineCap = 'round';
-      for (let i = 0; i < N; i++) {
-        const u0 = (i / N) * Math.PI * 2, u1 = ((i + 1) / N) * Math.PI * 2;
-        const p0 = pt(u0), p1 = pt(u1);
-        ctx.strokeStyle = ribbonColor((p0.x - (cx - A)) / (2 * A));
+    const dpt = (u) => ({ x: A * Math.cos(u), y: B * (Math.cos(u) * Math.cos(u) - Math.sin(u) * Math.sin(u)) });
+    const N = 260;
+    const W0 = size * 0.024;
+    const band = (wid, al) => {
+      ctx.lineCap = 'butt';
+      ctx.lineWidth = 2.4;
+      for (let i = 0; i <= N; i++) {
+        const u = (i / N) * Math.PI * 2;
+        const q = pt(u), d = dpt(u);
+        const len = Math.hypot(d.x, d.y) || 1;
+        const nx = -d.y / len, ny = d.x / len;
+        const half = W0 * wid * (0.3 + 0.7 * Math.abs(Math.sin(u)));
+        ctx.strokeStyle = ribbonColor((q.x - (cx - A)) / (2 * A));
         ctx.globalAlpha = alpha * al;
         ctx.beginPath();
-        ctx.moveTo(p0.x, p0.y);
-        ctx.lineTo(p1.x, p1.y);
+        ctx.moveTo(q.x - nx * half, q.y - ny * half);
+        ctx.lineTo(q.x + nx * half, q.y + ny * half);
         ctx.stroke();
       }
-    }
+    };
+    band(2.4, 0.08);   // 外发光
+    band(1.0, 0.95);   // 实心带
 
     // 沿曲线的星尘
-    for (let i = 0; i < 520; i++) {
-      const u = ((i / 520) * Math.PI * 2 + spin) % (Math.PI * 2);
-      const p = pt(u);
-      const off = (i % 7 - 3) * 0.9;
-      ctx.fillStyle = ribbonColor((p.x - (cx - A)) / (2 * A));
-      ctx.globalAlpha = alpha * (0.2 + 0.5 * Math.abs(Math.cos(u)));
-      ctx.fillRect(p.x + off * 0.3, p.y + off, 1.5, 1.5);
+    for (let i = 0; i < 420; i++) {
+      const u = ((i / 420) * Math.PI * 2 + spin) % (Math.PI * 2);
+      const q = pt(u), d = dpt(u);
+      const len = Math.hypot(d.x, d.y) || 1;
+      const nx = -d.y / len, ny = d.x / len;
+      const off = ((i % 9) / 8 - 0.5) * 2 * W0 * 0.9 * (0.3 + 0.7 * Math.abs(Math.sin(u)));
+      ctx.fillStyle = ribbonColor((q.x - (cx - A)) / (2 * A));
+      ctx.globalAlpha = alpha * (0.18 + 0.45 * Math.abs(Math.cos(u)));
+      ctx.fillRect(q.x + nx * off, q.y + ny * off, 1.2, 1.2);
     }
 
     // 中央白核
@@ -986,7 +1019,8 @@
       if (dx) ctx.fillRect(cx - len, cy - 1.2, len * 2, 2.4);
       else ctx.fillRect(cx - 1.2, cy - len, 2.4, len * 2);
     }
-    ctx.restore();
+    ctx.restore();   // 自转
+    ctx.restore();   // 合成模式
 
     // 标题与上下细线
     if (alpha > 0.5) {
@@ -996,7 +1030,7 @@
       ctx.fillStyle = selNow ? '#eef5ff' : '#cfd9f5';
       ctx.font = '600 15px "Microsoft YaHei", system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('记忆星图', cx, ty);
+      ctx.fillText('如我所书', cx, ty);
       const ruleW = 78;
       ctx.strokeStyle = 'rgba(150,180,240,0.28)';
       ctx.lineWidth = 1;
@@ -1219,6 +1253,17 @@
     closeRules();
   };
   R('r-close').onclick = () => maybeClose();
+  R('r-back').onclick = () => {
+    if (rulesEditing && !confirm('还有没保存的改动，确定离开？')) return;
+    rulesEditing = false;
+    R('r-save').disabled = true;
+    R('r-edit').classList.remove('on');
+    R('r-edit-area').classList.add('hidden');
+    R('r-view').classList.remove('hidden');
+    R('rules').classList.add('hidden');
+    canvas.style.filter = '';
+    backToGalaxy();
+  };
   R('rules').addEventListener('click', (e) => { if (e.target.id === 'rules') maybeClose(); });
 
   R('r-edit').onclick = async () => {
@@ -1315,6 +1360,8 @@
       if (nearSymbol(e.clientX, e.clientY)) {
         if (stage === 'symbol') stage = 'selected';
         else openRules();
+      } else {
+        backToGalaxy();          // 点图标以外的黑色区域：放大回星图
       }
       return;
     }
