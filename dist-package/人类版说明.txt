@@ -1,0 +1,34 @@
+记忆星图（dsh-memory-starmap）v0.2.0 安装包
+==========================================
+
+给不认识命令行也没关系 —— 把整个压缩包丢给你的 DSH，说一句：
+
+    「帮我装这个」
+
+它读了里面的「先读我-AI 安装说明.md」就会带你装。
+
+如果它没读，把这句话发给它：
+
+    「压缩包里有 先读我-AI 安装说明.md，请先读它，然后按里面的步骤帮我安装,
+      每一步都要告诉我实际结果。」
+
+人工装的话，三条命令（Windows，PowerShell）：
+
+    dsh plugin --profile desktop add file:<解压路径>\dsh-memory-starmap-0.2.0.tgz
+    node %USERPROFILE%\.dsh\profiles\desktop\node_modules\dsh-memory-starmap\bin\enable.mjs desktop
+    :: 然后完全退出并重新打开 DSH 桌面端
+
+装好的标志：侧栏出现「记忆星图」图标，点开能看到星带；点正中星核会凝缩成一枚 ∞ 徽标。
+
+文件清单
+--------
+dsh-memory-starmap-0.2.0.tgz    插件本体
+先读我-AI 安装说明.md           给 AI 看的完整说明（功能 / 用法 / 安装 / 排查）
+人类版说明.txt                  就是你正在看的这个
+
+注意
+----
+- 数据全在本机，插件不联网，不上传任何东西。
+- tgz 放到一个不会被删掉的目录，装完别删（路径会记进 profile）。
+- 卸载：dsh plugin --profile desktop remove dsh-memory-starmap，再把它从
+  %USERPROFILE%\.dsh\profiles\desktop\package.json 的 dsh.profile.bundles 里删掉，重启。

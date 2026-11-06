@@ -1,6 +1,6 @@
 {
   "name": "dsh-memory-starmap",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "记忆星图：把 DSH 的对话历史画成一条八字形星带，星点就是记忆，侧栏一点就能进；同一份索引还能按预算喂给模型。",
   "icon": "public/brand.jpg",
   "type": "module",
