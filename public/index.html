@@ -102,6 +102,15 @@
   padding: 16px 22px 20px; gap: 10px; }
 #rules.hidden { display: none; }
 
+/* 统一细滑条：深底 + 青色滑块，替掉系统的白条 */
+#rules * { scrollbar-width: thin; scrollbar-color: rgba(110,170,255,0.38) transparent; }
+#rules ::-webkit-scrollbar { width: 8px; height: 8px; }
+#rules ::-webkit-scrollbar-track { background: rgba(10,20,40,0.35); border-radius: 4px; }
+#rules ::-webkit-scrollbar-thumb { background: rgba(110,170,255,0.32); border-radius: 4px;
+  border: 2px solid transparent; background-clip: padding-box; }
+#rules ::-webkit-scrollbar-thumb:hover { background: rgba(140,205,255,0.6); background-clip: padding-box; }
+#rules ::-webkit-scrollbar-corner { background: transparent; }
+
 .r-head { display: flex; align-items: center; gap: 18px; }
 .r-back { flex: 0 0 auto; width: 28px; height: 28px; cursor: pointer; font-size: 18px; line-height: 1;
   color: #9fb6dd; background: rgba(18,28,52,0.7); border: 1px solid rgba(120,150,220,0.28);
@@ -111,9 +120,13 @@
 .r-brand b { font-size: 17px; letter-spacing: 5px; color: #e6eeff; text-indent: 5px;
   text-shadow: 0 0 16px rgba(120,180,255,0.4); }
 
-.r-tabs { display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1; padding-bottom: 2px; }
-.r-tabs::-webkit-scrollbar { height: 3px; }
-.r-tabs::-webkit-scrollbar-thumb { background: rgba(120,160,230,0.35); }
+/* 标签多了就换行，不出现横向滑条 */
+.r-tabs { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; flex: 1;
+  padding: 2px 0 4px; max-height: 84px; overflow-y: auto; overflow-x: hidden; }
+.r-tabs::-webkit-scrollbar { width: 6px; }
+.r-tabs::-webkit-scrollbar-track { background: transparent; }
+.r-tabs::-webkit-scrollbar-thumb { background: rgba(110,170,255,0.30); border-radius: 3px; }
+.r-tabs::-webkit-scrollbar-thumb:hover { background: rgba(140,200,255,0.55); }
 .tab { position: relative; white-space: nowrap; font-size: 12px; padding: 7px 16px; cursor: pointer;
   color: #8fa3cc; background: linear-gradient(180deg, rgba(28,42,80,0.55), rgba(12,20,42,0.5));
   border: 1px solid rgba(110,150,220,0.2); border-radius: 2px; }
@@ -147,7 +160,17 @@
   color: #e9f2ff; z-index: 2; }
 
 .r-cabinet { position: relative; display: flex; align-items: flex-end; gap: 8px; overflow-x: auto;
-  padding: 46px 2px 14px; min-height: 330px; }
+  scrollbar-width: none;               /* 不要那条白色横条 */
+  -ms-overflow-style: none;
+  padding: 46px 2px 14px; min-height: 330px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%); }
+.r-cabinet::-webkit-scrollbar { height: 0; width: 0; display: none; }
+/* 特异性要压过上面的 #rules ::-webkit-scrollbar */
+#rules .r-cabinet::-webkit-scrollbar { display: none; width: 0; height: 0; }
+#rules .r-cabinet { scrollbar-width: none; -ms-overflow-style: none; }   /* 压过 #rules * 的 thin */
+#rules .r-tabs::-webkit-scrollbar { width: 6px; height: 0; }
+#rules .r-tabs { scrollbar-width: thin; }
 .fab-label { position: absolute; top: 2px; transform: translateX(-50%); text-align: center;
   font-size: 12px; letter-spacing: 1px; color: #dce9ff; white-space: nowrap; pointer-events: none; }
 .fab-label::after { content: ''; position: absolute; left: 50%; top: 100%; width: 1px; height: 22px;
@@ -174,8 +197,10 @@
 .file-card .f-body { flex: 1; margin: 12px 8px; border-radius: 2px;
   background: linear-gradient(180deg, rgba(120,180,255,0.1), rgba(120,180,255,0.02) 55%, rgba(120,180,255,0.07));
   border: 1px solid rgba(120,180,255,0.14); }
-.file-card .f-name { font-size: 12px; color: #dbe7ff; padding: 0 9px 4px; }
-.file-card .f-meta { font-size: 10px; color: #7d8db4; padding: 0 9px 11px; line-height: 1.4; }
+.file-card .f-name { font-size: 12px; color: #dbe7ff; padding: 0 9px 4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-card .f-meta { font-size: 10px; color: #7d8db4; padding: 0 9px 11px; line-height: 1.4;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .file-card .f-badge { position: absolute; top: 8px; right: 8px; z-index: 2; font-size: 9px; padding: 1px 5px; border-radius: 2px; }
 .file-card .f-badge.global { color: #f0dfae; border: 1px solid rgba(226,200,140,0.55); background: rgba(40,32,12,0.6); }
 .file-card .f-badge.local { color: #9fd8ff; border: 1px solid rgba(120,190,255,0.4); background: rgba(14,32,56,0.6); }
@@ -1415,6 +1440,14 @@
     R('r-view').classList.remove('hidden');
     closeRules();
   };
+  // 文件柜没有滚动条：滚轮直接横向滚（按住 Shift 时浏览器自己处理）
+  R('r-cabinet').addEventListener('wheel', (e) => {
+    const box = R('r-cabinet');
+    if (box.scrollWidth <= box.clientWidth) return;
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    box.scrollLeft += e.deltaY;
+    e.preventDefault();
+  }, { passive: false });
   R('r-close').onclick = () => maybeClose();
   R('r-back').onclick = () => {
     if (rulesEditing && !confirm('还有没保存的改动，确定离开？')) return;
