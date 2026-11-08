@@ -341,12 +341,18 @@
 
   // ---------- 八字 × 莫比乌斯 ----------
   // 中心线：xz 平面里的八字（Gerono 双纽线），再叠一层 y 方向起伏
+  // 首尾接合点（t=0 与 t=2π 是同一个位置，宽度方向差 180°）本来落在正上端最亮处，
+  // 那道"边缘换位"的界线最扎眼。把参数平移四分之一圈，让它落到腰部原点，
+  // 正好被 drawCore 的中心光核压住。曲线作为集合没变，只是起点换了。
+  const BAND_PHASE = Math.PI / 2;
+
   function center(t) {
-    const c = Math.cos(t), s = Math.sin(t);
+    const u = t + BAND_PHASE;
+    const c = Math.cos(u), s = Math.sin(u);
     // 长轴放到 z 上：俯视时就是竖着的八字，腰部收细、两瓣拉长
-    return { x: 0.68 * Math.sin(2 * t), y: B * Math.sin(2 * t), z: A * c };
+    return { x: 0.68 * Math.sin(2 * u), y: B * Math.sin(2 * u), z: A * c };
   }
-  // 半个扭转的宽度方向：绕切线转 t/2
+  // 半个扭转的宽度方向：绕切线转 u/2
   function widthDir(t) {
     const e = 1e-3;
     const p0 = center(t - e), p1 = center(t + e);
@@ -359,7 +365,7 @@
     nx /= nl; ny /= nl; nz /= nl;
     // B = T × N
     const bx = ty * nz - tz * ny, by = tz * nx - tx * nz, bz = tx * ny - ty * nx;
-    const h = t / 2, ch = Math.cos(h), sh = Math.sin(h);
+    const h = (t + BAND_PHASE) / 2, ch = Math.cos(h), sh = Math.sin(h);
     return { x: nx * ch + bx * sh, y: ny * ch + by * sh, z: nz * ch + bz * sh };
   }
 
