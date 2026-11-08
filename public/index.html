@@ -459,9 +459,12 @@
   let selected = null, hovered = null, hits = [], query = '';
 
   // 开场动画：星系从腰开始一点点铺开，星星一颗一颗亮
-  const INTRO_MS = 2600;
+  const INTRO_MS = 2600;          // 星带闭合时间：不变
+  const NODE_DELAY_MS = 260;      // 闭合后停一下，再让记忆星冒头
+  const NODE_MS = 1500;           // 记忆星淡入，比星带慢
   const T0 = performance.now();
   let intro = 0;
+  let nodeIntro = 0;              // 记忆星自己的进度（星带闭合后才从 0 开始）
   let introDone = false;
 
   const FALLBACK_LAYERS = [
@@ -718,7 +721,7 @@
       .map((n) => ({ n, p: project(nodePos(n)) }))
       .sort((a, b) => a.p.z - b.p.z);
 
-    const nodeFade = Math.min(1, Math.max(0, (intro - 0.72) / 0.28));
+    const nodeFade = 1 - Math.pow(1 - nodeIntro, 2);   // easeOut，起始慢、末尾稳
     if (nodeFade <= 0) return;
 
     // 放大到 2.6→2.2 之间逐渐显形；悬停、选中、搜索命中的那颗始终全亮
@@ -845,6 +848,8 @@
 
     intro = Math.min(1, (now - T0) / INTRO_MS);
     if (intro >= 1) introDone = true;
+    // 记忆星从星带闭合之后才开始，比星带慢半拍
+    nodeIntro = Math.min(1, Math.max(0, (now - T0 - INTRO_MS - NODE_DELAY_MS) / NODE_MS));
     if (!dragging && (Math.abs(vYaw) > 0.00015 || Math.abs(vPitch) > 0.00015)) {
       target.yaw += vYaw;
       target.pitch += vPitch;
@@ -1893,7 +1898,7 @@
       const p = project(nodePos(n));
       return { x: Math.round(p.x), y: Math.round(p.y), id: n.id, text: n.text.slice(0, 30) };
     },
-    dbg: () => ({ intro, introDone }),
+    dbg: () => ({ intro, nodeIntro, introDone }),
   };
 
   requestAnimationFrame(frame);
