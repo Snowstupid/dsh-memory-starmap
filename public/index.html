@@ -231,16 +231,33 @@
 .sec-item:hover { background: rgba(60,100,180,0.14); color: #cfe0ff; }
 .sec-item.on { color: #eaf3ff; border-left-color: #6cd0ff; background: rgba(60,130,230,0.2); }
 
+.sec-item .sec-del { margin-left: auto; opacity: 0; font-size: 13px; line-height: 1; padding: 0 5px;
+  color: #7f8fb5; background: none; border: none; cursor: pointer; transition: opacity .15s, color .15s; }
+.sec-item:hover .sec-del { opacity: 1; }
+.sec-item .sec-del:hover { color: #ff8f8f; }
+.sec-add { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 6px 10px 10px;
+  padding: 8px 0; font-size: 12px; color: #8fb2e0; cursor: pointer;
+  background: rgba(50,90,160,0.14); border: 1px dashed rgba(110,170,240,0.34); border-radius: 2px; }
+.sec-add:hover { color: #dff0ff; border-color: rgba(140,205,255,0.7); background: rgba(60,120,220,0.22); }
+
 .r-detail { display: flex; flex-direction: column; min-height: 0; gap: 10px; position: relative;
   border: 1px solid rgba(110,170,240,0.32); background: rgba(14,28,58,0.62); padding: 16px 20px;
   box-shadow: inset 0 0 30px rgba(70,140,255,0.10); }
-.r-detail h3 { margin: 0; font-size: 15px; font-weight: 600; color: #eaf2ff; letter-spacing: 1px; }
+.sec-head { display: flex; align-items: center; gap: 10px; }
+.sec-hash { font-size: 13px; color: #6f8fc4; font-family: Consolas, monospace; letter-spacing: 1px; flex: 0 0 auto; }
+.sec-title { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; color: #eaf2ff; letter-spacing: 1px;
+  background: transparent; border: none; border-bottom: 1px solid rgba(110,170,240,0.25); padding: 4px 2px; }
+.sec-title:focus { outline: none; border-bottom-color: rgba(140,205,255,0.85); }
+.sec-del-btn { flex: 0 0 auto; font-size: 11px; padding: 4px 10px; cursor: pointer; border-radius: 2px;
+  color: #ffb3b3; background: rgba(90,26,32,0.45); border: 1px solid rgba(255,120,120,0.35); }
+.sec-del-btn:hover { color: #fff; border-color: rgba(255,150,150,0.8); }
 .r-meta { font-size: 11px; color: #6f80a8; word-break: break-all; }
+.sec-body { flex: 1; resize: none; background: rgba(6,12,26,0.55); color: #d7e4ff;
+  border: 1px solid rgba(110,160,240,0.28); border-radius: 2px; padding: 12px;
+  font-family: Consolas, monospace; font-size: 12.5px; line-height: 1.8; }
+.sec-body:focus { outline: none; border-color: rgba(140,205,255,0.7); background: rgba(8,16,34,0.8); }
 #r-view { flex: 1; overflow: auto; margin: 0; font-size: 13px; line-height: 1.9; color: #cfdaf0;
   white-space: pre-wrap; word-break: break-word; font-family: inherit; }
-#r-edit-area { flex: 1; resize: none; background: rgba(6,12,26,0.9); color: #d7e4ff;
-  border: 1px solid rgba(110,160,240,0.35); padding: 12px; font-family: Consolas, monospace;
-  font-size: 12.5px; line-height: 1.7; }
 .r-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
 .r-empty svg { filter: drop-shadow(0 0 16px rgba(255,70,70,0.35)); }
 .r-empty .e-title { font-size: 20px; letter-spacing: 12px; color: #ff7b7b; text-indent: 12px;
@@ -300,10 +317,14 @@
       <div class="r-list-body" id="r-list"></div>
     </aside>
     <section class="r-detail">
-      <h3 id="r-title">选择一份规则</h3>
+      <div class="sec-head">
+        <span class="sec-hash" id="r-hash">##</span>
+        <input id="r-sec-title" class="sec-title" placeholder="小节标题" autocomplete="off" />
+        <button id="r-sec-del" class="sec-del-btn" title="删除这一节">删除</button>
+      </div>
       <div class="r-meta" id="r-meta"></div>
+      <textarea id="r-sec-body" class="sec-body" spellcheck="false" placeholder="这一节的内容…"></textarea>
       <pre id="r-view"></pre>
-      <textarea id="r-edit-area" class="hidden" spellcheck="false"></textarea>
     </section>
   </div>
 </div>
@@ -1272,7 +1293,10 @@
   function showError(msg) {
     R('r-note').textContent = '读取失败';
     R('r-note').style.color = '#ff7b7b';
-    R('r-title').textContent = '';
+    R('r-sec-title').classList.add('hidden');
+    R('r-sec-body').classList.add('hidden');
+    R('r-sec-del').classList.add('hidden');
+    R('r-hash').textContent = '';
     R('r-cabinet').style.display = 'none';
     R('r-edit').disabled = true;
     R('r-save').disabled = true;
@@ -1381,63 +1405,214 @@
     }
   }
 
+  // ---------- 规则正文：解析成小节，可增删改名，改动即存 ----------
+  let rulesText = '';
+  let rulesParsed = { preamble: '', sections: [] };
+  let saveTimer = 0;
+  let saving = false;
+
+  function parseRules(text) {
+    const lines = String(text || '').split(/\r?\n/);
+    const pre = [];
+    const sections = [];
+    let cur = null;
+    for (const line of lines) {
+      const m = /^(#{1,6})\s+(.*)$/.exec(line);
+      if (m) {
+        if (cur) sections.push(cur);
+        cur = { level: m[1].length, title: m[2].trim(), lines: [] };
+      } else if (cur) {
+        cur.lines.push(line);
+      } else {
+        pre.push(line);
+      }
+    }
+    if (cur) sections.push(cur);
+    for (const s of sections) {
+      while (s.lines.length && !s.lines[s.lines.length - 1].trim()) s.lines.pop();
+      while (s.lines.length && !s.lines[0].trim()) s.lines.shift();
+      s.body = s.lines.join('\n');
+    }
+    return { preamble: pre.join('\n').replace(/\s+$/, ''), sections };
+  }
+
+  function buildRules(doc) {
+    const blocks = [];
+    if (doc.preamble.trim()) blocks.push(doc.preamble.replace(/\s+$/, ''));
+    for (const s of doc.sections) {
+      const head = '#'.repeat(s.level) + ' ' + (s.title.trim() || '未命名小节');
+      const body = (s.body || '').replace(/\s+$/, '');
+      blocks.push(body ? head + '\n' + body : head);
+    }
+    return blocks.join('\n\n').replace(/\s*$/, '\n');
+  }
+
+  function defaultLevel(doc) {
+    if (!doc.sections.length) return 2;
+    const count = {};
+    for (const s of doc.sections) count[s.level] = (count[s.level] || 0) + 1;
+    return Number(Object.entries(count).sort((a, b) => b[1] - a[1])[0][0]);
+  }
+
+  function showEmpty(title, note) {
+    R('r-view').classList.remove('hidden');
+    R('r-view').innerHTML = '<div class="r-empty teal">' + FOLDER_SVG
+      + '<div class="e-title">' + title + '</div><div class="e-note">' + note + '</div></div>';
+    R('r-sec-title').classList.add('hidden');
+    R('r-sec-body').classList.add('hidden');
+    R('r-sec-del').classList.add('hidden');
+    R('r-hash').textContent = '';
+  }
+
   async function pickFile(i) {
     rulesIdx = i;
     rulesSec = 0;
-    rulesEditing = false;
     renderTabs();
     renderCabinet();
     const f = fileAt(i);
     rulesPath = f.path;
     rulesMtime = f.mtime;
-    R('r-edit').classList.remove('on');
-    R('r-save').disabled = true;
-    R('r-edit-area').classList.add('hidden');
-    R('r-view').classList.remove('hidden');
-    R('r-title').textContent = f.kind === 'global' ? '全局规则' : baseName(f.cwd) + ' · 规则';
+    R('r-list').innerHTML = '';
     R('r-list-head').textContent = '小节';
+    R('r-edit').disabled = Boolean(f.exists);
+    R('r-edit').textContent = f.exists ? '编辑' : '新建文件';
+    R('r-save').disabled = false;
 
     if (!f.exists) {
+      rulesText = '';
+      rulesParsed = { preamble: '', sections: [] };
       R('r-meta').textContent = f.path + '（还没有这个文件）';
-      R('r-list').innerHTML = '';
-      R('r-view').innerHTML = '<div class="r-empty teal">' + FOLDER_SVG
-        + '<div class="e-title">还没有规则</div>'
-        + '<div class="e-note">' + fileLabel(f) + ' 还没有 AGENTS.md。点「编辑」新建，内容只有一行标题：# ' + fileLabel(f) + ' · 规则</div></div>';
-      R('r-edit').dataset.create = '1';
+      showEmpty('还没有规则', fileLabel(f) + ' 还没有 AGENTS.md。点顶栏「新建文件」创建，之后一个个加小节。');
       return;
     }
-    R('r-edit').dataset.create = '';
-    R('r-meta').textContent = f.path + ' · ' + f.size + 'B · ' + new Date(f.mtime).toLocaleString();
-    renderSections(f);
-    R('r-view').textContent = f.sections[0] ? f.sections[0].text : '';
+    const res = await fetch('api/rules/file?path=' + encodeURIComponent(f.path));
+    if (!res.ok) { R('r-meta').textContent = f.path; showEmpty('读取失败', 'HTTP ' + res.status); return; }
+    const d = await res.json();
+    rulesMtime = d.mtime;
+    rulesText = d.content;
+    rulesParsed = parseRules(rulesText);
+    R('r-meta').textContent = f.path + ' · ' + rulesText.length + 'B · ' + new Date(d.mtime).toLocaleString();
+    renderSections();
+    if (rulesParsed.sections.length) selectSection(0);
+    else showEmpty('还没有小节', '点左下「＋ 新建小节」加一节。');
   }
 
-  function renderSections(f) {
+  function renderSections() {
     const box = R('r-list');
     box.innerHTML = '';
-    R('r-list-head').textContent = (f.kind === 'global' ? '全局规则' : baseName(f.cwd)) + ' · ' + f.sections.length + ' 节';
-    f.sections.forEach((sec, i) => {
+    const secs = rulesParsed.sections;
+    R('r-list-head').textContent = fileLabel(fileAt(rulesIdx)) + ' · ' + secs.length + ' 节';
+    secs.forEach((sec, i) => {
       const el = document.createElement('div');
-      el.className = 'sec-item' + (i === 0 ? ' on' : '');
-      el.innerHTML = '<i>' + String(i + 1).padStart(2, '0') + '</i><span>' + sec.title + '</span>'
-        + (fresh(f.mtime) ? '<em>新</em>' : '');
-      el.onclick = () => {
-        rulesSec = i;
-        [...box.children].forEach((c, k) => c.classList.toggle('on', k === i));
-        R('r-view').textContent = sec.text;
-        R('r-title').textContent = sec.title;
+      el.className = 'sec-item' + (i === rulesSec ? ' on' : '');
+      el.innerHTML = '<i>' + String(i + 1).padStart(2, '0') + '</i><span>' + esc(sec.title) + '</span>'
+        + '<button class="sec-del" title="删除这一节">×</button>';
+      el.onclick = (e) => {
+        if (e.target && e.target.classList.contains('sec-del')) return;
+        selectSection(i);
+      };
+      el.querySelector('.sec-del').onclick = (e) => {
+        e.stopPropagation();
+        deleteSection(i);
       };
       box.appendChild(el);
     });
+    const add = document.createElement('div');
+    add.className = 'sec-add';
+    add.textContent = '＋ 新建小节';
+    add.onclick = () => addSection();
+    box.appendChild(add);
   }
 
-  const maybeClose = () => {
-    if (rulesEditing && !confirm('还有没保存的改动，确定关掉？')) return;
-    rulesEditing = false;
-    R('r-save').disabled = true;
-    R('r-edit').classList.remove('on');
-    R('r-edit-area').classList.add('hidden');
-    R('r-view').classList.remove('hidden');
+  function selectSection(i) {
+    if (!rulesParsed.sections.length) return;
+    rulesSec = Math.max(0, Math.min(i, rulesParsed.sections.length - 1));
+    const s = rulesParsed.sections[rulesSec];
+    [...R('r-list').querySelectorAll('.sec-item')].forEach((c, k) => c.classList.toggle('on', k === rulesSec));
+    R('r-view').classList.add('hidden');
+    R('r-sec-title').classList.remove('hidden');
+    R('r-sec-body').classList.remove('hidden');
+    R('r-sec-del').classList.remove('hidden');
+    R('r-sec-title').value = s.title;
+    R('r-hash').textContent = '#'.repeat(s.level);
+    R('r-sec-body').value = s.body;
+  }
+
+  function scheduleSave() {
+    R('r-note').style.color = '';
+    R('r-note').textContent = '未保存…';
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(flushSave, 900);
+  }
+
+  async function flushSave() {
+    clearTimeout(saveTimer);
+    if (saving) { saveTimer = setTimeout(flushSave, 200); return; }
+    if (!rulesPath) return;
+    const text = buildRules(rulesParsed);
+    if (text === rulesText) return;
+    saving = true;
+    try {
+      const res = await fetch('api/rules/file', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ path: rulesPath, mtime: rulesMtime, content: text }),
+      });
+      if (res.status === 409) {
+        R('r-note').textContent = '文件刚被别处改过，已重新载入，请再改一次';
+        await pickFile(rulesIdx);
+        return;
+      }
+      if (!res.ok) { R('r-note').textContent = '保存失败：' + res.status; return; }
+      const d = await res.json();
+      rulesMtime = d.mtime;
+      rulesText = text;
+      R('r-note').textContent = '已保存 · ' + d.size + 'B';
+    } finally {
+      saving = false;
+    }
+  }
+
+  async function addSection() {
+    const level = defaultLevel(rulesParsed);
+    rulesParsed.sections.push({ level, title: '新小节', body: '' });
+    renderSections();
+    selectSection(rulesParsed.sections.length - 1);
+    R('r-sec-title').focus();
+    R('r-sec-title').select();
+    await flushSave();
+  }
+
+  async function deleteSection(i) {
+    const s = rulesParsed.sections[i];
+    if (!s) return;
+    if (!confirm('删除小节「' + s.title + '」？内容和它一起删掉（文件写过备份，可以找回）。')) return;
+    rulesParsed.sections.splice(i, 1);
+    renderSections();
+    if (rulesParsed.sections.length) selectSection(Math.min(i, rulesParsed.sections.length - 1));
+    else showEmpty('这一节删掉了', '点左下「＋ 新建小节」再加一节。');
+    await flushSave();
+  }
+
+  R('r-sec-title').addEventListener('input', () => {
+    const s = rulesParsed.sections[rulesSec];
+    if (!s) return;
+    s.title = R('r-sec-title').value;
+    const item = R('r-list').querySelectorAll('.sec-item')[rulesSec];
+    if (item) item.querySelector('span').textContent = s.title || '（未命名）';
+    scheduleSave();
+  });
+  R('r-sec-body').addEventListener('input', () => {
+    const s = rulesParsed.sections[rulesSec];
+    if (!s) return;
+    s.body = R('r-sec-body').value;
+    scheduleSave();
+  });
+  R('r-sec-title').addEventListener('blur', () => { flushSave(); });
+  R('r-sec-body').addEventListener('blur', () => { flushSave(); });
+  R('r-sec-del').onclick = () => deleteSection(rulesSec);
+
+  const maybeClose = async () => {
+    await flushSave();
     closeRules();
   };
   // 文件柜没有滚动条：滚轮直接横向滚（按住 Shift 时浏览器自己处理）
@@ -1449,13 +1624,8 @@
     e.preventDefault();
   }, { passive: false });
   R('r-close').onclick = () => maybeClose();
-  R('r-back').onclick = () => {
-    if (rulesEditing && !confirm('还有没保存的改动，确定离开？')) return;
-    rulesEditing = false;
-    R('r-save').disabled = true;
-    R('r-edit').classList.remove('on');
-    R('r-edit-area').classList.add('hidden');
-    R('r-view').classList.remove('hidden');
+  R('r-back').onclick = async () => {
+    await flushSave();
     R('rules').classList.add('hidden');
     canvas.style.filter = '';
     backToGalaxy();
@@ -1463,6 +1633,7 @@
   R('rules').addEventListener('click', (e) => { if (e.target.id === 'rules') maybeClose(); });
 
   R('r-edit').onclick = async () => {
+    return;   // 旧实现废弃，见下方新的绑定
     if (rulesEditing) return;
     const f = fileAt(rulesIdx);
     const name = f.kind === 'global' ? '全局' : (f.cwd || '').split(/[\\/]/).filter(Boolean).pop();
@@ -1487,6 +1658,7 @@
   };
 
   R('r-save').onclick = async () => {
+    return;   // 旧实现废弃，见下方新的绑定
     if (!rulesEditing) return;
     const f = fileAt(rulesIdx);
     const body = { path: rulesPath, mtime: rulesMtime, content: R('r-edit-area').value, create: !f.exists };
@@ -1510,6 +1682,24 @@
     R('r-note').textContent = '已保存 · ' + d.size + 'B';
     await loadRules(); pickFile(rulesIdx);
   };
+
+  // 顶栏按钮的新绑定（覆盖上面的旧实现）
+  R('r-edit').onclick = async () => {
+    const f = fileAt(rulesIdx);
+    if (f.exists) return;                       // 已有文件时按钮是禁用的
+    const name = f.kind === 'global' ? '全局' : baseName(f.cwd);
+    if (!confirm('新建 ' + f.path + '？')) return;
+    const text = '# ' + name + ' · 规则\n';
+    const res = await fetch('api/rules/file', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ path: f.path, mtime: 0, content: text, create: true }),
+    });
+    if (!res.ok) { R('r-note').textContent = '新建失败：' + res.status; return; }
+    R('r-note').textContent = '已新建 ' + name + ' 的规则文件';
+    await loadRules();
+    await pickFile(rulesIdx);
+  };
+  R('r-save').onclick = async () => { await flushSave(); };
 
   window.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
