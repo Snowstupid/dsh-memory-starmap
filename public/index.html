@@ -569,7 +569,8 @@
       starA[i] = 0.16 + Math.random() * 0.55;
       starR[i] = 0.32 + Math.random() * 0.85;
       // 腰部先亮，再顺着两瓣往两头铺；乘 0.92 给最后一点收尾时间
-      starThr[i] = Math.abs(Math.cos((starT[i] / K) * Math.PI * 2)) * 0.92 + (i % 7) * 0.0018;
+      // 阈值要按"实际位置"算（参数已平移 BAND_PHASE），否则会变成两头先亮
+      starThr[i] = Math.abs(Math.cos((starT[i] / K) * Math.PI * 2 + BAND_PHASE)) * 0.92 + (i % 7) * 0.0018;
       // 颜色沿带子分段：金 → 粉 → 紫 → 青 → 青绿 → 白，像一条会变色的光
       const jitter = (Math.random() - 0.5) * 1.1;
       const c = ((Math.floor((starT[i] / K) * 6.5 + jitter) % 6) + 6) % 6;
