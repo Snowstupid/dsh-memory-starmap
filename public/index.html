@@ -269,6 +269,8 @@
 .r-empty.teal svg { filter: drop-shadow(0 0 16px rgba(90,170,255,0.35)); }
 .r-empty.teal .e-title { color: #dbe8ff; text-shadow: 0 0 18px rgba(90,170,255,0.35); }
 .r-empty.teal .e-note { color: #8497bd; }
+.r-empty.teal button { color: #cfe2ff; background: rgba(30,60,120,0.5); border-color: rgba(120,190,255,0.45); }
+.r-empty.teal button:hover { color: #fff; border-color: rgba(150,210,255,0.9); box-shadow: 0 0 14px rgba(90,170,255,0.35); }
 .r-empty button:hover { color: #fff; border-color: rgba(255,160,160,0.85); box-shadow: 0 0 14px rgba(255,80,80,0.35); }
 .r-error button { margin-left: 10px; font-size: 12px; padding: 4px 12px; cursor: pointer;
   background: rgba(80,30,40,0.6); color: #ffd7d7; border: 1px solid rgba(255,140,140,0.45); border-radius: 2px; }
@@ -304,7 +306,6 @@
     <div class="r-brand"><b>如我所书</b></div>
     <div class="r-tabs" id="r-tabs"></div>
     <div class="r-actions">
-      <button id="r-edit">编辑</button>
       <button id="r-save" disabled>保存</button>
       <button id="r-close">×</button>
     </div>
@@ -1290,6 +1291,18 @@
     '</svg>',
   ].join('');
 
+  // 空态用的空文件夹（没有红叉，蓝色调）
+  const EMPTY_SVG = [
+    '<svg width="236" height="176" viewBox="0 0 236 176" fill="none">',
+    '<path d="M22 40 L22 30 Q22 24 30 24 L92 24 Q98 24 102 30 L110 40"',
+    ' stroke="rgba(120,180,255,0.5)" stroke-width="2" stroke-linejoin="round"/>',
+    '<rect x="18" y="38" width="200" height="118" rx="8"',
+    ' fill="rgba(16,32,62,0.35)" stroke="rgba(120,180,255,0.55)" stroke-width="2"/>',
+    '<rect x="40" y="52" width="156" height="82" rx="7"',
+    ' fill="rgba(10,20,42,0.45)" stroke="rgba(140,200,255,0.22)" stroke-width="1.5"/>',
+    '</svg>',
+  ].join('');
+
   function showError(msg) {
     R('r-note').textContent = '读取失败';
     R('r-note').style.color = '#ff7b7b';
@@ -1298,7 +1311,6 @@
     R('r-sec-del').classList.add('hidden');
     R('r-hash').textContent = '';
     R('r-cabinet').style.display = 'none';
-    R('r-edit').disabled = true;
     R('r-save').disabled = true;
     const aside = document.querySelector('.r-list');
     if (aside) aside.style.display = 'none';
@@ -1331,7 +1343,6 @@
     }
     rulesData = await res.json();
     R('r-cabinet').style.display = '';
-    R('r-edit').disabled = false;
     const aside2 = document.querySelector('.r-list');
     if (aside2) aside2.style.display = '';
     const main2 = document.querySelector('.r-main');
@@ -1456,7 +1467,7 @@
 
   function showEmpty(title, note) {
     R('r-view').classList.remove('hidden');
-    R('r-view').innerHTML = '<div class="r-empty teal">' + FOLDER_SVG
+    R('r-view').innerHTML = '<div class="r-empty teal">' + EMPTY_SVG
       + '<div class="e-title">' + title + '</div><div class="e-note">' + note + '</div></div>';
     R('r-sec-title').classList.add('hidden');
     R('r-sec-body').classList.add('hidden');
@@ -1474,15 +1485,18 @@
     rulesMtime = f.mtime;
     R('r-list').innerHTML = '';
     R('r-list-head').textContent = '小节';
-    R('r-edit').disabled = Boolean(f.exists);
-    R('r-edit').textContent = f.exists ? '编辑' : '新建文件';
     R('r-save').disabled = false;
 
     if (!f.exists) {
       rulesText = '';
       rulesParsed = { preamble: '', sections: [] };
       R('r-meta').textContent = f.path + '（还没有这个文件）';
-      showEmpty('还没有规则', fileLabel(f) + ' 还没有 AGENTS.md。点顶栏「新建文件」创建，之后一个个加小节。');
+      showEmpty('还没有规则', fileLabel(f) + ' 还没有 AGENTS.md。点下面「新建文件」创建，之后一个个加小节。');
+      const bar = document.createElement('div');
+      bar.className = 'e-actions';
+      bar.innerHTML = '<button id="r-create">新建文件</button>';
+      R('r-view').querySelector('.r-empty').appendChild(bar);
+      R('r-create').onclick = () => createRuleFile();
       return;
     }
     const res = await fetch('api/rules/file?path=' + encodeURIComponent(f.path));
@@ -1632,61 +1646,12 @@
   };
   R('rules').addEventListener('click', (e) => { if (e.target.id === 'rules') maybeClose(); });
 
-  R('r-edit').onclick = async () => {
-    return;   // 旧实现废弃，见下方新的绑定
-    if (rulesEditing) return;
-    const f = fileAt(rulesIdx);
-    const name = f.kind === 'global' ? '全局' : (f.cwd || '').split(/[\\/]/).filter(Boolean).pop();
-    let text = '';
-    if (f.exists) {
-      const res = await fetch('api/rules/file?path=' + encodeURIComponent(f.path));
-      if (!res.ok) { R('r-note').textContent = '读取失败：' + res.status; return; }
-      const d = await res.json();
-      text = d.content; rulesMtime = d.mtime;
-    } else {
-      text = '# ' + name + ' · 规则\n';
-      if (!confirm('这会新建 ' + f.path + '，确定？')) return;
-    }
-    if (!confirm('这些文件是对我的设定，改完会影响下一轮对话的行为。继续编辑？')) return;
-    R('r-edit-area').value = text;
-    R('r-edit-area').classList.remove('hidden');
-    R('r-view').classList.add('hidden');
-    R('r-save').disabled = false;
-    R('r-edit').classList.add('on');
-    rulesEditing = true;
-    R('r-edit-area').focus();
-  };
 
-  R('r-save').onclick = async () => {
-    return;   // 旧实现废弃，见下方新的绑定
-    if (!rulesEditing) return;
-    const f = fileAt(rulesIdx);
-    const body = { path: rulesPath, mtime: rulesMtime, content: R('r-edit-area').value, create: !f.exists };
-    const res = await fetch('api/rules/file', {
-      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
-    });
-    if (res.status === 409) {
-      R('r-note').textContent = '文件刚被别处改过，已重新载入，请再改一次';
-      rulesEditing = false;
-      R('r-save').disabled = true; R('r-edit').classList.remove('on');
-      R('r-edit-area').classList.add('hidden'); R('r-view').classList.remove('hidden');
-      await loadRules(); pickFile(rulesIdx);
-      return;
-    }
-    if (!res.ok) { R('r-note').textContent = '保存失败：' + res.status; return; }
-    const d = await res.json();
-    rulesMtime = d.mtime;
-    rulesEditing = false;
-    R('r-save').disabled = true; R('r-edit').classList.remove('on');
-    R('r-edit-area').classList.add('hidden'); R('r-view').classList.remove('hidden');
-    R('r-note').textContent = '已保存 · ' + d.size + 'B';
-    await loadRules(); pickFile(rulesIdx);
-  };
 
-  // 顶栏按钮的新绑定（覆盖上面的旧实现）
-  R('r-edit').onclick = async () => {
+  // 空态里的「新建文件」按钮
+  async function createRuleFile() {
     const f = fileAt(rulesIdx);
-    if (f.exists) return;                       // 已有文件时按钮是禁用的
+    if (f.exists) return;
     const name = f.kind === 'global' ? '全局' : baseName(f.cwd);
     if (!confirm('新建 ' + f.path + '？')) return;
     const text = '# ' + name + ' · 规则\n';
@@ -1698,7 +1663,7 @@
     R('r-note').textContent = '已新建 ' + name + ' 的规则文件';
     await loadRules();
     await pickFile(rulesIdx);
-  };
+  }
   R('r-save').onclick = async () => { await flushSave(); };
 
   window.addEventListener('keydown', (e) => {
